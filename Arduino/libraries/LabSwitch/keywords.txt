@@ -1,2 +1,6 @@
 LabSwitch	KEYWORD1
-getState		KEYWORD2
+isOn	KEYWORD2
+isOff	KEYWORD2
+event	KEYWORD2
+attach	KEYWORD2
+detach	KEYWORD2

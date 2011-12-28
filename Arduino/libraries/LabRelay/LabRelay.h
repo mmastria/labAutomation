@@ -17,6 +17,7 @@ class LabRelay {
 	
 	byte _pinRelay;
 	boolean _state;
+	
 };
 
 #endif

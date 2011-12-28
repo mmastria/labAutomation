@@ -24,6 +24,16 @@ void LabSwitch::event() {
 	Serial.print(_pinSwitch, DEC);
 	Serial.print("_:_read_");
 	Serial.println(digitalRead(_pinSwitch));
-	
+  if (_callback)
+    (*_callback)();
 }
 
+void LabSwitch::attach(callbackFunction callback)
+{
+	_callback = callback;
+}
+
+void LabSwitch::detach()
+{
+	_callback = NULL;
+}

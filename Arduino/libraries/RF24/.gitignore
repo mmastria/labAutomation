@@ -1,0 +1,11 @@
+*.bak
+*.o
+.*.swp
+*.orig
+.swp
+docs/
+output/
+ojam/
+out_native/
+version.h
+Session.vim

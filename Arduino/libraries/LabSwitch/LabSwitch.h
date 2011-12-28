@@ -3,10 +3,6 @@
 
 #include <Arduino.h>
 
-extern "C" {
-    typedef void (*callbackFunction)(void);
-}
-
 class LabSwitch {
 	
 	public:
@@ -16,14 +12,10 @@ class LabSwitch {
 	boolean isOn();
 	boolean isOff();
 	void event();
-	void attach(callbackFunction callback);
-  void detach();
 	
 	private:
 	
 	byte _pinSwitch;
-  callbackFunction _callback;
-
 };
 
 #endif

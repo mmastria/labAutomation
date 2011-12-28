@@ -21,13 +21,13 @@ void loop()
 }
 
 void eventOpen() {
-  if(switchOpened.getState()==1) {
+  if(switchOpened.isOff()) {
     switchOpened.event();
   }
 }
 
 void eventClose() {
-  if(switchClosed.getState()==1) {
+  if(switchClosed.isOff()) {
     switchClosed.event();
   }
 }

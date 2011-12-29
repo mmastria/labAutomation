@@ -1,7 +1,0 @@
-#include "LabSwitchOpenedWrapper.h"
-
-LabSwitchOpenedWrapper::event(LabRelay relay) {
-}
-
-LabSwitchOpenedWrapper::setRelay(LabRelay* relay) {
-}

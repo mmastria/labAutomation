@@ -27,3 +27,8 @@ void LabSwitch::event() {
 	
 }
 
+void LabSwitch::setRelay(LabRelay *relayPtr) {
+	if (relayPtr!=NULL) {
+		_relayPtr=relayPtr;
+	}
+}

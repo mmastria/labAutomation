@@ -20,6 +20,10 @@ void LabRelay::off() {
 	digitalWrite(_pinRelay, _state);
 }
 
-boolean LabRelay::getState() {
+boolean LabRelay::isOn() {
 	return _state;
+}
+
+boolean LabRelay::isOff() {
+	return !isOn();
 }

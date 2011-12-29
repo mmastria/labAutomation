@@ -9,9 +9,12 @@ class LabRelay {
 	
 	LabRelay();
 	LabRelay(byte pinRelay);
+
 	void on();
 	void off();
-	boolean getState();
+
+	boolean isOn();
+	boolean isOff();
 		
 	private:
 	

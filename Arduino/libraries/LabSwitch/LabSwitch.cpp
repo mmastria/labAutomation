@@ -9,26 +9,18 @@ LabSwitch::LabSwitch(byte pinSwitch) {
 }
 
 boolean LabSwitch::isOn() {
-	if (digitalRead(_pinSwitch) == HIGH)
+	if (digitalRead(_pinSwitch) == HIGH) {
     	return true;
-  	else
+	}
+  	else {
     	return false;
+  	}
 }
 
 boolean LabSwitch::isOff() {
 	return !isOn();
 }
 
-void LabSwitch::event() {
-	Serial.print("_LabSwitch::event_:_pin_");
-	Serial.print(_pinSwitch, DEC);
-	Serial.print("_:_read_");
-	Serial.println(digitalRead(_pinSwitch));
-	
-}
-
-void LabSwitch::setRelay(LabRelay *relayPtr) {
-	if (relayPtr!=NULL) {
-		_relayPtr=relayPtr;
-	}
+void LabSwitch::doEvent() {
+	callEvent();
 }

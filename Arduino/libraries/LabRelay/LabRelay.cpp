@@ -21,9 +21,18 @@ void LabRelay::off() {
 }
 
 boolean LabRelay::isOn() {
-	return _state;
+	if (_state==LOW) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 boolean LabRelay::isOff() {
 	return !isOn();
+}
+
+void LabRelay::doEvent() {
+	off();
 }

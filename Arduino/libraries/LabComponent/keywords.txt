@@ -1,6 +1,4 @@
-LabSwitch		KEYWORD1
-isOn			KEYWORD2
-isOff			KEYWORD2
+LabComponent	KEYWORD1
 setComponent	KEYWORD2
 callEvent		KEYWORD2
 doEvent			KEYWORD2

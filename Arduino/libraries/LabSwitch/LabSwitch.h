@@ -2,9 +2,9 @@
 #define __LAB_SWITCH__
 
 #include <Arduino.h>
-#include <../LabRelay/LabRelay.h>
+#include "../LabComponent/LabComponent.h"
 
-class LabSwitch {
+class LabSwitch : public LabComponent {
 	
 	public:
 	
@@ -13,14 +13,12 @@ class LabSwitch {
 	
 	boolean isOn();
 	boolean isOff();
-	void event();
 	
-	void setRelay(LabRelay *relayPtr);
-	
+	void doEvent();
+
 	private:
 	
 	byte _pinSwitch;
-	LabRelay * _relayPtr;
 	
 };
 

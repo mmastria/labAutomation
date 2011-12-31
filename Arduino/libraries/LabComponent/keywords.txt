@@ -1,4 +1,0 @@
-LabComponent	KEYWORD1
-setComponent	KEYWORD2
-callEvent		KEYWORD2
-doEvent			KEYWORD2

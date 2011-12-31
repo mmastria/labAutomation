@@ -2,9 +2,9 @@
 #define __LAB_MOTOR__
 
 #include <Arduino.h>
-#include "../LabComponent/LabComponent.h"
-#include "../LabSwitch/LabSwitch.h"
-#include "../LabRelay/LabRelay.h"
+#include "LabComponent.h"
+#include "LabSwitch.h"
+#include "LabRelay.h"
 
 class LabMotor : public LabComponent {
 	

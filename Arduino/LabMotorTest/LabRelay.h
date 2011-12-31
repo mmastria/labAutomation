@@ -2,7 +2,7 @@
 #define __LAB_RELAY__
 
 #include <Arduino.h>
-#include "../LabComponent/LabComponent.h"
+#include "LabComponent.h"
 
 class LabRelay : public LabComponent {
 	

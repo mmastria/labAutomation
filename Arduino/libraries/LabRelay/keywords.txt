@@ -1,8 +1,0 @@
-LabRelay		KEYWORD1
-on				KEYWORD2
-off				KEYWORD2
-isOn			KEYWORD2
-isOff			KEYWORD2
-setComponent	KEYWORD2
-callEvent		KEYWORD2
-doEvent			KEYWORD2

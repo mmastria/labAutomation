@@ -1,9 +1,9 @@
 #include <PinChangeInt.h>
 #include <PinChangeIntConfig.h>
-#include <LabMotor.h>
-#include <LabSwitch.h>
-#include <LabRelay.h>
-#include <LabComponent.h>
+#include "LabMotor.h"
+#include "LabSwitch.h"
+#include "LabRelay.h"
+#include "LabComponent.h"
 
 #define SWITCH_FORWARD 6
 #define SWITCH_REVERSE 7

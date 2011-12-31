@@ -2,7 +2,7 @@
 #define __LAB_SWITCH__
 
 #include <Arduino.h>
-#include "../LabComponent/LabComponent.h"
+#include "LabComponent.h"
 
 class LabSwitch : public LabComponent {
 	

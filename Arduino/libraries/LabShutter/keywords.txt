@@ -1,4 +1,0 @@
-LabShutter	KEYWORD1
-callEvent	KEYWORD2
-doEvent		KEYWORD2
-

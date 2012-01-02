@@ -1,11 +1,12 @@
-#include <PinChangeInt.h>
-#include <PinChangeIntConfig.h>
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
-#include <LabSwitch.h>
-#include <LabRelay.h>
-#include <LabShutter.h>
+#include <PinChangeInt.h>
+#include <PinChangeIntConfig.h>
+#include "LabSwitch.h"
+#include "LabRelay.h"
+#include "LabMotor.h"
+#include "LabShutter.h"
 
 #define RELAY_OPEN 4
 #define RELAY_CLOSE 5

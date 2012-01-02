@@ -3,7 +3,6 @@
 #include "LabMotor.h"
 #include "LabSwitch.h"
 #include "LabRelay.h"
-#include "LabComponent.h"
 
 #define SWITCH_FORWARD 6
 #define SWITCH_REVERSE 7
@@ -16,8 +15,6 @@ LabSwitch switchReverse(SWITCH_REVERSE);
 LabRelay relayForward(RELAY_FORWARD);
 LabRelay relayReverse(RELAY_REVERSE);
 LabMotor motorShutter;
-
-char r=0;
 
 void setupIrq() {
   PCintPort::attachInterrupt(SWITCH_FORWARD, eventSwitchForward, RISING);

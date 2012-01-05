@@ -15,9 +15,34 @@ void LabShutter::stop() {
   _motorPtr->off();
 }
 
+void LabShutter::doEvent() {
+  while( !_radioPtr->available() );
+  _radioPtr->read( &command, sizeof(command) );
+  switch(command.cmd) {
+    case CMD_STOP:
+      stop();
+      break;
+    case CMD_OPEN:
+      open();
+      break;
+    case CMD_CLOSE:
+      close();
+      break;
+  }
+}
+
 void LabShutter::setMotor(LabMotor *motorPtr) {
   if (motorPtr!=NULL) {
     _motorPtr=motorPtr;
+  }
+}
+
+void LabShutter::setRadio(RF24 *radioPtr) {
+  if (radioPtr!=NULL) {
+    _radioPtr=radioPtr;
+    _radioPtr->begin();
+    _radioPtr->openReadingPipe(1,pipes[0]);
+    _radioPtr->startListening();
   }
 }
 

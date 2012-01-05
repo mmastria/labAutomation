@@ -3,6 +3,25 @@
 LabShutter::LabShutter() {
 }
 
+void LabShutter::open() {
+  _motorPtr->forward();
+}
+
+void LabShutter::close() {
+  _motorPtr->reverse();
+}
+
+void LabShutter::stop() {
+  _motorPtr->off();
+}
+
+void LabShutter::setMotor(LabMotor *motorPtr) {
+  if (motorPtr!=NULL) {
+    _motorPtr=motorPtr;
+  }
+}
+
+/*
 LabShutter::LabShutter(LabRelay relayOpen, LabRelay relayClose, LabSwitch switchOpened, LabSwitch switchClosed) {
 	_relayOpen = relayOpen;
 	_relayClose = relayClose;
@@ -57,3 +76,5 @@ void LabShutter::doStop() {
 	_relayOpen.off();
 	_relayClose.off();
 }	
+*/
+

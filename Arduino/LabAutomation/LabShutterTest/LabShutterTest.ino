@@ -23,17 +23,22 @@ LabRelay relayClose(RELAY_CLOSE);
 LabMotor motor;
 LabShutter shutter;
 
-void setupIrq() {
-  PCintPort::attachInterrupt(SWITCH_OPENED, eventSwitchOpened, RISING);
-  PCintPort::attachInterrupt(SWITCH_CLOSED, eventSwitchClosed, RISING);
-}
-
-void eventSwitchOpened() {
+void switchOpenedEvent() {
   switchOpened.callEvent();
 }
 
-void eventSwitchClosed() {
+void switchClosedEvent() {
   switchClosed.callEvent();
+}
+
+void shutterEvent() {
+  shutter.callEvent();
+}
+
+void setupIrq() {
+  PCintPort::attachInterrupt(SWITCH_OPENED, switchOpenedEvent, RISING);
+  PCintPort::attachInterrupt(SWITCH_CLOSED, switchClosedEvent, RISING);
+  attachInterrupt(0, shutterEvent, FALLING);
 }
 
 void setup() {
@@ -59,7 +64,7 @@ void setup() {
 
 
 void loop() {
-  shutter.doEvent();
+//  shutter.doEvent();
 }
 
 

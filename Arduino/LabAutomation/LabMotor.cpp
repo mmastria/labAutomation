@@ -20,11 +20,11 @@ void LabMotor::reverse() {
 void LabMotor::off() {
 	if (isForward()) {
 		_relayForwardPtr->off();
-		delay(200);
+		delay(500);
 	}
 	if (isReverse()) {
 		_relayReversePtr->off();
-		delay(200);
+		delay(500);
 	}
 }
 

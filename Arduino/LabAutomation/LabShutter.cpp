@@ -16,18 +16,27 @@ void LabShutter::stop() {
 }
 
 void LabShutter::doEvent() {
-  while( !_radioPtr->available() );
-  _radioPtr->read( &command, sizeof(command) );
-  switch(command.cmd) {
-    case CMD_STOP:
-      stop();
-      break;
-    case CMD_OPEN:
-      open();
-      break;
-    case CMD_CLOSE:
-      close();
-      break;
+  bool tx, fail, rx;
+  _radioPtr->whatHappened(rx, fail, rx);
+  //if (tx)   Ack Payload Sent
+  //if (fail) Ack Payload Failed to Sent
+  if (rx) {
+    _radioPtr->read( &command, sizeof(command) );
+    switch(command.cmd) {
+      case CMD_STOP:
+        stop();
+        break;
+      case CMD_OPEN:
+        open();
+        break;
+      case CMD_CLOSE:
+        close();
+        break;
+    }
+    //command.cmd = SHUTTER_STATE;
+    //command.cmd = command.cmd + getState();
+    command.cmd = SHUTTER_STATE_UNKNOWN;
+    _radioPtr->writeAckPayload(1, &command, sizeof(command));
   }
 }
 
@@ -41,9 +50,14 @@ void LabShutter::setRadio(RF24 *radioPtr) {
   if (radioPtr!=NULL) {
     _radioPtr=radioPtr;
     _radioPtr->begin();
+    _radioPtr->enableAckPayload();
     _radioPtr->openReadingPipe(1,pipes[0]);
     _radioPtr->startListening();
   }
+}
+
+byte LabShutter::getState() {
+  return SHUTTER_UNKNOWN;
 }
 
 /*

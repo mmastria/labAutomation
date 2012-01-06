@@ -11,7 +11,27 @@ LabCommand command;
 
 void setupRadio() {
   radio.begin();
+  radio.enableAckPayload();
   radio.openWritingPipe(pipes[0]);
+}
+
+void radioEvent() {
+  bool tx, fail, rx;
+  radio.whatHappened(tx, fail, rx);
+  //if (tx) {
+  //  Serial.println("Sent OK");
+  //}
+  //if (fail) {
+  //  Serial.println("Sent fail");
+  //}
+  if (tx || fail) {
+    radio.powerDown();
+  }
+  if (rx) {
+    radio.read(&command, sizeof(command));
+    //Serial.print("Ack:");
+    //Serial.println(command.cmd);
+  }
 }
 
 void setup()
@@ -21,24 +41,25 @@ void setup()
   Serial.println("LabDomeTest");
   
   setupRadio();
+  attachInterrupt(0, radioEvent, FALLING);
   delay(2000);  
 }
 
 void loop() {
 
   command.cmd=CMD_OPEN;
-  Serial.println("CMD_OPEN");
-  radio.write(&command, sizeof(command));
+  //Serial.println("\nCMD_OPEN");
+  radio.startWrite(&command, sizeof(command));
   delay(3000);
 
   command.cmd=CMD_STOP;
-  Serial.println("CMD_STOP");
-  radio.write(&command, sizeof(command));
+  //Serial.println("\nCMD_STOP");
+  radio.startWrite(&command, sizeof(command));
   delay(1000);
 
   command.cmd=CMD_CLOSE;
-  Serial.println("CMD_CLOSE");
-  radio.write(&command, sizeof(command));
+  //Serial.println("\nCMD_CLOSE");
+  radio.startWrite(&command, sizeof(command));
   delay(3000);
 
 //  command.cmd=CMD_STOP;

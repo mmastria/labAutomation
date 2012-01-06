@@ -22,7 +22,7 @@ class LabRelay : public LabComponent {
 	private:
 	
 	byte _pinRelay;
-	boolean _state;
+	volatile boolean _state;
 
 };
 

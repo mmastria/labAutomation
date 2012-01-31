@@ -11,10 +11,10 @@ class LabEncoder : public LabComponent {
 	LabEncoder();
 	LabEncoder(byte pinEncoder);
 
-	void pulse();
+	void doEvent();
 	void reset();
 
-	long value();
+	long getValue();
 
 	private:
 	

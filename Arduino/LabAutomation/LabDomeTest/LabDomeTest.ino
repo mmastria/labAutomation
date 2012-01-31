@@ -50,17 +50,17 @@ void loop() {
   command.cmd=CMD_OPEN;
   //Serial.println("\nCMD_OPEN");
   radio.startWrite(&command, sizeof(command));
-  delay(5000);
+  delay(3000);
 
   command.cmd=CMD_STOP;
   //Serial.println("\nCMD_STOP");
   radio.startWrite(&command, sizeof(command));
-  delay(5000);
+  delay(1000);
 
   command.cmd=CMD_CLOSE;
   //Serial.println("\nCMD_CLOSE");
   radio.startWrite(&command, sizeof(command));
-  delay(5000);
+  delay(3000);
 
 //  command.cmd=CMD_STOP;
 //  Serial.println("CMD_STOP");

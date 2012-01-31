@@ -30,8 +30,6 @@ class LabMotor : public LabComponent {
 		
 	private:
 
-        void delay_ms(unsigned int time);
-
 	LabSwitch *_switchForwardPtr;
 	LabSwitch *_switchReversePtr;
 	LabRelay *_relayForwardPtr;

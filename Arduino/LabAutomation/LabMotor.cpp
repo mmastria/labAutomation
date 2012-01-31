@@ -1,4 +1,5 @@
 #include "LabMotor.h"
+#include <util/delay.h>
 
 LabMotor::LabMotor() {
 }
@@ -20,11 +21,11 @@ void LabMotor::reverse() {
 void LabMotor::off() {
 	if (isForward()) {
 		_relayForwardPtr->off();
-		delay(500);
+                delay_ms(500);
 	}
 	if (isReverse()) {
 		_relayReversePtr->off();
-		delay(500);
+                delay_ms(500);
 	}
 }
 
@@ -83,3 +84,9 @@ void LabMotor::setRelayReverse(LabRelay *relayPtr) {
 		_relayReversePtr=relayPtr;
 	}
 }
+
+void LabMotor::delay_ms(unsigned int time) { 
+ while (time--) 
+   _delay_ms(1); 
+}
+

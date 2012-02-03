@@ -5,21 +5,21 @@
 #include "LabComponent.h"
 
 class LabEncoder : public LabComponent {
-	
-	public:
-	
-	LabEncoder();
-	LabEncoder(byte pinEncoder);
 
-	void doEvent();
-	void reset();
+  public:
 
-	long getValue();
+  LabEncoder();
+  LabEncoder(byte pinEncoder);
 
-	private:
+  void doEvent();
+  void reset();
+
+  long getValue();
+
+  private:
 	
-	byte _pinEncoder;
-	volatile long _value;
+  byte _pinEncoder;
+  volatile long _value;
 
 };
 

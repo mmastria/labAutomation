@@ -15,6 +15,7 @@ class LabDome : public LabComponent {
    LabDome();
    
    void doEvent();
+   void doTest();
    
    void setRadio(RF24 *radioPtr);
    

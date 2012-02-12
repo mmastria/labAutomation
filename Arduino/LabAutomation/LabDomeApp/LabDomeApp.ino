@@ -59,9 +59,12 @@ void setup()
   Serial.println("> setup OK; ready!");
   Serial.println("");
 
-  delay(2000);  
+  delay(2000);
 }
 
 void loop() {
+  dome.doTest();
+  Serial.println("");
+  delay(5000);
 }
 

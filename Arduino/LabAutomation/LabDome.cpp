@@ -5,26 +5,24 @@ LabDome::LabDome() {
 
 void LabDome::doEvent() {
   bool tx, fail, rx;
-  _radioPtr->whatHappened(rx, fail, rx);
-  //if (tx)   Ack Payload Sent
-  //if (fail) Ack Payload Failed to Sent
+  _radioPtr->whatHappened(tx, fail, rx);
+  if (tx)  {
+    Serial.println("< tx - Ack Payload Sent");
+  }
+  if (fail) {
+    Serial.println("< fail - Ack Payload Failed to Sent");
+  }
   if (rx) {
     _radioPtr->read( &command, sizeof(command) );
-    switch(command.cmd) {
+    Serial.print("> Event: ");
+    Serial.println(command.getName());
+    Serial.println("");
+//    switch(command.cmd) {
 //      case CMD_STOP:
 //        stop();
 //        break;
-//      case CMD_OPEN:
-//        open();
-//        break;
-//      case CMD_CLOSE:
-//        close();
-//        break;
-    }
-    //command.cmd = SHUTTER_STATE;
-    //command.cmd = command.cmd + getState();
-//    command.cmd = SHUTTER_STATE_UNKNOWN;
-    _radioPtr->writeAckPayload(1, &command, sizeof(command));
+//    }
+//    _radioPtr->writeAckPayload(1, &command, sizeof(command));
   }
 }
 
@@ -38,7 +36,33 @@ void LabDome::setRadio(RF24 *radioPtr) {
   }
 }
 
+void LabDome::doTest() {
 
+  command.cmd=SHUTTER_EVENT_OPEN;
+  Serial.print("> Call: ");
+  Serial.println(command.getName());
+  _radioPtr->startWrite(&command, sizeof(command));
+  delay(2000);
+
+  command.cmd=SHUTTER_EVENT_STOP;
+  Serial.print("> Call: ");
+  Serial.println(command.getName());
+  _radioPtr->startWrite(&command, sizeof(command));
+  delay(2000);
+
+  command.cmd=SHUTTER_EVENT_CLOSE;
+  Serial.print("> Call: ");
+  Serial.println(command.getName());
+  _radioPtr->startWrite(&command, sizeof(command));
+  delay(2000);
+
+  command.cmd=SHUTTER_EVENT_STOP;
+  Serial.print("> Call: ");
+  Serial.println(command.getName());
+  _radioPtr->startWrite(&command, sizeof(command));
+  delay(2000);
+
+}
 
 
 //------------------------

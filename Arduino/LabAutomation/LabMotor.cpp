@@ -5,14 +5,14 @@ LabMotor::LabMotor() {
 }
 
 void LabMotor::forward() {
-	if (!isSwitchForwardOn()) {
+	if (!isForward() && !isSwitchForwardOn()) {
 		off();
 		_relayForwardPtr->on();
 	}
 }
 
 void LabMotor::reverse() {
-	if (!isSwitchReverseOn()) {
+	if (!isReverse() && !isSwitchReverseOn()) {
 		off();
 		_relayReversePtr->on();
 	}

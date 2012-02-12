@@ -17,25 +17,29 @@ void LabShutter::stop() {
 
 void LabShutter::doEvent() {
   bool tx, fail, rx;
-  _radioPtr->whatHappened(rx, fail, rx);
+  _radioPtr->whatHappened(tx, fail, rx);
   //if (tx)   Ack Payload Sent
   //if (fail) Ack Payload Failed to Sent
   if (rx) {
     _radioPtr->read( &command, sizeof(command) );
+    Serial.print("> Event: ");
+    Serial.println(command.getName());
     switch(command.cmd) {
-      case CMD_STOP:
+      case SHUTTER_EVENT_STOP:
         stop();
         break;
-      case CMD_OPEN:
+      case SHUTTER_EVENT_OPEN:
         open();
         break;
-      case CMD_CLOSE:
+      case SHUTTER_EVENT_CLOSE:
         close();
         break;
+      // any other, only return state
     }
-    //command.cmd = SHUTTER_STATE;
-    //command.cmd = command.cmd + getState();
-    command.cmd = SHUTTER_STATE_UNKNOWN;
+    command.cmd = getState();
+    Serial.print("> State: ");
+    Serial.println(command.getName());
+    Serial.println("");
     _radioPtr->writeAckPayload(1, &command, sizeof(command));
   }
 }
@@ -56,64 +60,19 @@ void LabShutter::setRadio(RF24 *radioPtr) {
   }
 }
 
-byte LabShutter::getState() {
-  return SHUTTER_UNKNOWN;
-}
-
-/*
-LabShutter::LabShutter(LabRelay relayOpen, LabRelay relayClose, LabSwitch switchOpened, LabSwitch switchClosed) {
-	_relayOpen = relayOpen;
-	_relayClose = relayClose;
-	_switchOpened = switchOpened;
-	_switchClosed = switchClosed;
-	_event = SHUTTER_NONE;
-	_state = SHUTTER_UNKNOWN;
-	if (_switchClosed.isOn()) {
-		_state = SHUTTER_CLOSED;
-	}
-	else if(_switchOpened.isOn()) {
-		_state = SHUTTER_OPENED;
-	}
-}
-
-void LabShutter::callEvent(shutter_event_e event) {
-	_event = event;
-}
-
-void LabShutter::doEvent() {
-	if (_event!=SHUTTER_NONE) {
-		switch(_event) {
-			case SHUTTER_CLOSE:
-				doClose();
-				break;
-			case SHUTTER_OPEN:
-				doOpen();
-				break;
-		}
-	}
-	_event = SHUTTER_NONE;
-}
-
-void LabShutter::doClose() {
-	Serial.println("_LabShutter::doClose_");
-	_relayOpen.off();
-	if (_state!=SHUTTER_CLOSED) {
-		_relayClose.on();
-	}	
-}
-
-void LabShutter::doOpen() {
-	Serial.println("_LabShutter::doOpen_");
-	_relayClose.off();
-	if(_state!=SHUTTER_OPENED) {
-		_relayOpen.on();
-	}
-}
-
-void LabShutter::doStop() {
-	Serial.println("_LabShutter::doStop_");
-	_relayOpen.off();
-	_relayClose.off();
-}	
-*/
+command_e LabShutter::getState() {
+  if (_motorPtr->isSwitchReverseOn() && _motorPtr->isOff()) {
+      return SHUTTER_STATE_CLOSED;
+  }
+  if (_motorPtr->isSwitchForwardOn() && _motorPtr->isOff()) {
+      return SHUTTER_STATE_OPENED;
+  }
+  if (_motorPtr->isReverse()) {
+      return SHUTTER_STATE_CLOSING;
+  }
+  if (_motorPtr->isForward()) {
+      return SHUTTER_STATE_OPENING;
+  }
+  return SHUTTER_STATE_UNKNOWN;
+}  
 

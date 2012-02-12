@@ -6,19 +6,19 @@
 #include "LabSwitch.h"
 #include "LabEncoder.h"
 #include "LabDome.h"
-//#include "LabBeep.h"
+#include "LabBeep.h"
 
 #define SWITCH_HOME 6
 #define ENCODER 7
 
-//#define BEEPER 10
+#define BEEPER 10
 
 RF24 radio(8,9);
 
 LabEncoder encoder(ENCODER);
 LabSwitch switchHome(SWITCH_HOME);
 LabDome dome;
-//LabBeep beep(BEEPER);
+LabBeep beep(BEEPER);
 
 void switchHomeEvent() {
   switchHome.callEvent();
@@ -29,7 +29,7 @@ void encoderEvent() {
 }
 
 void domeEvent() {
-//  beep.play();
+  beep.play();
   dome.callEvent();
 }
 
@@ -43,8 +43,11 @@ void setup()
 {
   Serial.begin(57600);
   Serial.println("");
-  Serial.println("LabDomeTest");
-//  beep.play();
+  Serial.println("LabDomeApp");
+  Serial.println("release 0.1 - 2012-feb-11");
+  Serial.println("serial log 57600,n,8,1,p");
+  Serial.println("");
+  beep.play();
 
   switchHome.setComponent(&encoder);
   
@@ -52,6 +55,9 @@ void setup()
   dome.setRadio(&radio);
 
   setupIrq();
+
+  Serial.println("> setup OK; ready!");
+  Serial.println("");
 
   delay(2000);  
 }

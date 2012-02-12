@@ -4,26 +4,28 @@
 #include <Arduino.h>
 #include "LabComponent.h"
 
-class LabRelay : public LabComponent {
-	
-	public:
-	
-	LabRelay();
-	LabRelay(byte pinRelay);
+class LabRelay : 
+public LabComponent {
 
-	void on();
-	void off();
+public:
 
-	boolean isOn();
-	boolean isOff();
-	
-	void doEvent();
-			
-	private:
-	
-	byte _pinRelay;
-	volatile boolean _state;
+  LabRelay();
+  LabRelay(byte pinRelay);
+
+  void on();
+  void off();
+
+  boolean isOn();
+  boolean isOff();
+
+  void doEvent();
+
+private:
+
+  byte _pinRelay;
+  volatile boolean _state;
 
 };
 
 #endif
+

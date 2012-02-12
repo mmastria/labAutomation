@@ -5,18 +5,19 @@
 
 class LabBeep {
 
-  public:
-  
+public:
+
   LabBeep();
   LabBeep(byte pinBeep);
-  
+
   void play();
- 
-  private:
-  
+
+private:
+
   void delay_ms(unsigned int time);
   byte _pinBeep;
-  
+
 };
 
 #endif
+

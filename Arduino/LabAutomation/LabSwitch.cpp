@@ -4,23 +4,24 @@ LabSwitch::LabSwitch() {
 }
 
 LabSwitch::LabSwitch(byte pinSwitch) {
-	_pinSwitch = pinSwitch;
-	pinMode(_pinSwitch, INPUT);
+  _pinSwitch = pinSwitch;
+  pinMode(_pinSwitch, INPUT);
 }
 
 boolean LabSwitch::isOn() {
-	if (digitalRead(_pinSwitch) == HIGH) {
-    	return true;
-	}
-  	else {
-    	return false;
-  	}
+  if (digitalRead(_pinSwitch) == HIGH) {
+    return true;
+  }
+  else {
+    return false;
+  }
 }
 
 boolean LabSwitch::isOff() {
-	return !isOn();
+  return !isOn();
 }
 
 void LabSwitch::doEvent() {
-	callEvent();
+  callEvent();
 }
+

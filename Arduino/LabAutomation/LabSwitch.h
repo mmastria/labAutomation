@@ -4,22 +4,24 @@
 #include <Arduino.h>
 #include "LabComponent.h"
 
-class LabSwitch : public LabComponent {
-	
-	public:
-	
-	LabSwitch();
-	LabSwitch(byte pinSwitch);
-	
-	boolean isOn();
-	boolean isOff();
-	
-	void doEvent();
+class LabSwitch : 
+public LabComponent {
 
-	private:
-	
-	byte _pinSwitch;
-	
+public:
+
+  LabSwitch();
+  LabSwitch(byte pinSwitch);
+
+  boolean isOn();
+  boolean isOff();
+
+  void doEvent();
+
+private:
+
+  byte _pinSwitch;
+
 };
 
 #endif
+

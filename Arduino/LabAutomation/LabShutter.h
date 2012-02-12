@@ -9,25 +9,27 @@
 #include "LabMotor.h"
 #include "LabCommand.h"
 
-const uint64_t pipes[4] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL, 0xF0F0F0F0C3LL, 0xF0F0F0F0B4LL };
+const uint64_t pipes[4] = { 
+  0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL, 0xF0F0F0F0C3LL, 0xF0F0F0F0B4LL };
 
-class LabShutter : public LabComponent {
-	
-  public:
-	
-   LabShutter();
-   
-   void open();
-   void close();
-   void stop();
-   
-   void doEvent();
-   
-   void setMotor(LabMotor *motorPtr);
-   void setRadio(RF24 *radioPtr);
-   
-   command_e getState();
-	
+class LabShutter : 
+public LabComponent {
+
+public:
+
+  LabShutter();
+
+  void open();
+  void close();
+  void stop();
+
+  void doEvent();
+
+  void setMotor(LabMotor *motorPtr);
+  void setRadio(RF24 *radioPtr);
+
+  command_e getState();
+
 private:
 
   LabMotor *_motorPtr;
@@ -37,3 +39,4 @@ private:
 };
 
 #endif
+

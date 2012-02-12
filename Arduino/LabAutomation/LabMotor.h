@@ -6,37 +6,37 @@
 #include "LabSwitch.h"
 #include "LabRelay.h"
 
-class LabMotor : public LabComponent {
-	
-	public:
-	
-	LabMotor();
+class LabMotor : 
+public LabComponent {
 
-	void forward();
-	void reverse();
-	void off();
+public:
 
-	boolean isForward();
-	boolean isReverse();
-	boolean isOff();
-	
-	boolean isSwitchForwardOn();
-	boolean isSwitchReverseOn();
-	
-	void setSwitchForward(LabSwitch *switchPtr);
-	void setSwitchReverse(LabSwitch *switchPtr);
-	void setRelayForward(LabRelay *relayPtr);
-	void setRelayReverse(LabRelay *relayPtr);
-		
-	private:
+  LabMotor();
 
-        void delay_ms(unsigned int time);
+  void forward();
+  void reverse();
+  void off();
 
-	LabSwitch *_switchForwardPtr;
-	LabSwitch *_switchReversePtr;
-	LabRelay *_relayForwardPtr;
-	LabRelay *_relayReversePtr;
+  boolean isForward();
+  boolean isReverse();
+  boolean isOff();
+
+  boolean isSwitchForwardOn();
+  boolean isSwitchReverseOn();
+
+  void setSwitchForward(LabSwitch *switchPtr);
+  void setSwitchReverse(LabSwitch *switchPtr);
+  void setRelayForward(LabRelay *relayPtr);
+  void setRelayReverse(LabRelay *relayPtr);
+
+private:
+
+  LabSwitch *_switchForwardPtr;
+  LabSwitch *_switchReversePtr;
+  LabRelay *_relayForwardPtr;
+  LabRelay *_relayReversePtr;
 
 };
 
 #endif
+

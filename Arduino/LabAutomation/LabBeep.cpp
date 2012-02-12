@@ -16,6 +16,7 @@ void LabBeep::play() {
 }
 
 void LabBeep::delay_ms(unsigned int time) { 
- while (time--) 
-   _delay_ms(1); 
+  while (time--) 
+    _delay_ms(1); 
 } 
+

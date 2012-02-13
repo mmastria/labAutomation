@@ -7,6 +7,7 @@
 #include "LabEncoder.h"
 #include "LabDome.h"
 #include "LabBeep.h"
+#include "printf.h"
 
 #define SWITCH_HOME 6
 #define ENCODER 7
@@ -42,11 +43,10 @@ void setupIrq() {
 void setup()
 {
   Serial.begin(57600);
-  Serial.println("");
-  Serial.println("LabDomeApp");
-  Serial.println("release 0.1 - 2012-feb-11");
-  Serial.println("serial log 57600,n,8,1,p");
-  Serial.println("");
+  printf_begin();
+  printf("\n\rLabDomeApp\n\r");
+  printf("release 0.1 - 2012-feb-11\n\r");
+  printf("serial log 57600,n,8,1,p\n\r\n\r");
   beep.play();
 
   switchHome.setComponent(&encoder);
@@ -56,15 +56,14 @@ void setup()
 
   setupIrq();
 
-  Serial.println("> setup OK; ready!");
-  Serial.println("");
+  printf("> setup OK; ready!\n\r\n\r");
 
   delay(2000);
 }
 
 void loop() {
   dome.doTest();
-  Serial.println("");
+  printf("\n\r");
   delay(5000);
 }
 

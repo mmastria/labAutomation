@@ -8,6 +8,7 @@
 #include "LabMotor.h"
 #include "LabShutter.h"
 #include "LabBeep.h"
+#include "printf.h"
 
 #define SWITCH_OPENED 6
 #define SWITCH_CLOSED 7
@@ -48,11 +49,10 @@ void setupIrq() {
 
 void setup() {
   Serial.begin(57600);
-  Serial.println("");
-  Serial.println("LabShutterApp");
-  Serial.println("release 0.1 - 2012-feb-11");
-  Serial.println("serial log 57600,n,8,1,p");
-  Serial.println("");
+  printf_begin();
+  printf("\n\rLabShutterApp\n\r");
+  printf("release 0.1 - 2012-feb-11\n\r");
+  printf("serial log 57600,n,8,1,p\n\r\n\r");
   beep.play();
 
   switchOpened.setComponent(&relayOpen);
@@ -68,8 +68,7 @@ void setup() {
 
   setupIrq();
 
-  Serial.println("> setup OK; ready!");
-  Serial.println("");
+  printf("> setup OK; ready!\n\r\n\r");
 
   delay(2000);
 }

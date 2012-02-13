@@ -10,6 +10,10 @@ do
     mv $j ..
     ln -s ../$j
   done
+  ls -lah
+  echo .
+  echo . ...............................
+  echo .
   cd $p
 done
 

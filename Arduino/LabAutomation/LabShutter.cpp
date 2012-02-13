@@ -19,14 +19,14 @@ void LabShutter::doEvent() {
   bool tx, fail, rx;
   _radioPtr->whatHappened(tx, fail, rx);
   if (tx) {
-    printf("< tx -  Ack Payload Sent\n\r");
+    printf("<tx> Ack Payload Sent (State: %s)\n\r", command.getName());
   }
   if (fail) {
-    printf("< fail - Ack Payload Failed to Sent\n\r");
+    printf("<fail> Ack Payload Failed to Sent\n\r");
   }
   if (rx) {
     _radioPtr->read( &command, sizeof(command) );
-    printf("> Event: %s\n\r", command.getName());
+    printf("\n\r<rx> Event: %s\n\r", command.getName());
     switch(command.cmd) {
     case SHUTTER_EVENT_STOP:
       stop();
@@ -39,10 +39,10 @@ void LabShutter::doEvent() {
       break;
       // any other, only return state
     }
-    //delay_ms(100);  
+    delay_ms(50);  
     command.cmd = getState();
+    //printf("> State: %s\n\r\n\r", command.getName());
     _radioPtr->writeAckPayload(1, &command, sizeof(command));
-    printf("> State: %s\n\r\n\r", command.getName());
   }
 }
 

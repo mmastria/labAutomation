@@ -14,8 +14,8 @@ public:
 
   LabCommand();
 
-  command_e cmd;
-  char* getName();
+  volatile command_e cmd;
+  const char* getName();
 
 };
 

@@ -1,12 +1,12 @@
 #include "LabCommand.h"
 
-char* command_name[] = { 
+const char* command_name[] = { 
   "<event>", "Stop", "Open", "Close", "<state>", "Semi-Opened", "Closed", "Opened", "Closing", "Opening", "Error" };
 
 LabCommand::LabCommand() {
 }
 
-char* LabCommand::getName() {
+const char* LabCommand::getName() {
   return command_name[cmd];
 }
 

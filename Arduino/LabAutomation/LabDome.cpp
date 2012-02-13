@@ -7,20 +7,17 @@ void LabDome::doEvent() {
   bool tx, fail, rx;
   _radioPtr->whatHappened(tx, fail, rx);
   if (tx)  {
-    printf("< tx - Ack Payload Sent\n\r");
+    printf("<tx> Data Sent OK\n\r");
   }
   if (fail) {
-    printf("< fail - Ack Payload Failed to Sent\n\r");
+    printf("<fail> Data Failed to Sent\n\r");
+  }
+  if (tx || fail) {
+    _radioPtr->powerDown();
   }
   if (rx) {
     _radioPtr->read( &command, sizeof(command) );
-    printf("> Event: %s\n\r", command.getName());
-//    switch(command.cmd) {
-//      case CMD_STOP:
-//        stop();
-//        break;
-//    }
-//    _radioPtr->writeAckPayload(1, &command, sizeof(command));
+    printf("<rx> Ack: %s\n\r", command.getName());
   }
 }
 
@@ -29,35 +26,34 @@ void LabDome::setRadio(RF24 *radioPtr) {
     _radioPtr=radioPtr;
     _radioPtr->begin();
     _radioPtr->enableAckPayload();
-    _radioPtr->openReadingPipe(1,pipes[0]);
-    _radioPtr->startListening();
+    _radioPtr->openWritingPipe(pipes[0]);
   }
 }
 
 void LabDome::doTest() {
 
   command.cmd=SHUTTER_EVENT_OPEN;
-  printf("> Call: %s\n\r", command.getName());
+  printf("\n\r> Call: %s\n\r", command.getName());
   _radioPtr->startWrite(&command, sizeof(command));
   delay_ms(4000);
 
   command.cmd=SHUTTER_EVENT_STOP;
-  printf("> Call: %s\n\r", command.getName());
+  printf("\n\r> Call: %s\n\r", command.getName());
   _radioPtr->startWrite(&command, sizeof(command));
   delay_ms(4000);
 
   command.cmd=SHUTTER_EVENT_CLOSE;
-  printf("> Call: %s\n\r", command.getName());
+  printf("\n\r> Call: %s\n\r", command.getName());
   _radioPtr->startWrite(&command, sizeof(command));
   delay_ms(4000);
 
   command.cmd=SHUTTER_STATE;
-  printf("> Call: %s\n\r", command.getName());
+  printf("\n\r> Call: %s\n\r", command.getName());
   _radioPtr->startWrite(&command, sizeof(command));
   delay_ms(4000);
 
   command.cmd=SHUTTER_EVENT_STOP;
-  printf("> Call: %s\n\r", command.getName());
+  printf("\n\r> Call: %s\n\r", command.getName());
   _radioPtr->startWrite(&command, sizeof(command));
   delay_ms(4000);
 

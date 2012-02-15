@@ -25,24 +25,39 @@ void LabShutter::doEvent() {
     printf("<fail> Ack Payload Failed to Sent\n\r");
   }
   if (rx) {
-    _radioPtr->read( &command, sizeof(command) );
-    printf("\n\r<rx> Event: %s\n\r", command.getName());
-    switch(command.cmd) {
-    case SHUTTER_EVENT_STOP:
-      stop();
-      break;
-    case SHUTTER_EVENT_OPEN:
-      open();
-      break;
-    case SHUTTER_EVENT_CLOSE:
-      close();
-      break;
-      // any other, only return state
+    unsigned long started_waiting_at = millis();
+    bool timeout = false;
+    bool done = false;
+    while (!_radioPtr->available() && !timeout) {
+      if (millis() - started_waiting_at > 250) {
+        timeout = true;
+      }
     }
-    delay_ms(50);  
-    command.cmd = getState();
-    //printf("> State: %s\n\r\n\r", command.getName());
-    _radioPtr->writeAckPayload(1, &command, sizeof(command));
+    if (!timeout) {
+      while(!done) {
+        done = _radioPtr->read( &command, sizeof(command) );
+        if (!done) {
+          printf("\n\r<rx> Event: %s\n\r", command.getName());
+        }
+      }
+      printf("\n\r<rx> Last Event: %s\n\r", command.getName());
+      switch(command.cmd) {
+      case SHUTTER_EVENT_STOP:
+        stop();
+        break;
+      case SHUTTER_EVENT_OPEN:
+        open();
+        break;
+      case SHUTTER_EVENT_CLOSE:
+        close();
+        break;
+      }
+      delay_ms(50);  
+      command.cmd = getState();
+//////      _radioPtr->stopListening();
+      _radioPtr->writeAckPayload(1, &command, sizeof(command));
+//////      _radioPtr->startListening();
+    }
   }
 }
 

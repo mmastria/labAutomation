@@ -16,8 +16,23 @@ void LabDome::doEvent() {
     _radioPtr->powerDown();
   }
   if (rx) {
-    _radioPtr->read( &command, sizeof(command) );
-    printf("<rx> Ack: %s\n\r", command.getName());
+    unsigned long started_waiting_at = millis();
+    bool timeout = false;
+    bool done = false;
+    while (!_radioPtr->isAckPayloadAvailable() && !timeout) {
+      if (millis() - started_waiting_at > 250) {
+        timeout = true;
+      }
+    }
+    if (!timeout) {
+      while(!done) {
+        done = _radioPtr->read( &command, sizeof(command) );
+        if (!done) {
+          printf("<rx> Ack: %s\n\r", command.getName());
+        }
+      }
+      printf("<rx> Last Ack: %s\n\r", command.getName());
+    }
   }
 }
 

@@ -45,6 +45,12 @@ void LabDome::setRadio(RF24 *radioPtr) {
   }
 }
 
+void LabDome::setIRReceiver(LabIRReceiver *irReceiverPtr) {
+  if (irReceiverPtr!=NULL) {
+    _irReceiverPtr=irReceiverPtr;
+  }
+}
+
 void LabDome::doTest() {
 
   command.cmd=SHUTTER_EVENT_OPEN;

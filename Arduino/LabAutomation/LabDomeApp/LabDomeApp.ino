@@ -1,16 +1,39 @@
 #include <SPI.h>
 #include "nRF24L01.h"
 #include "RF24.h"
+#include "IRremote.h"
 #include <PinChangeInt.h>
 #include <PinChangeIntConfig.h>
 #include "LabSwitch.h"
 #include "LabEncoder.h"
+#include "LabIrReceiver.h"
 #include "LabDome.h"
 #include "LabBeep.h"
 #include "printf.h"
 
+//
+// alterar IRRemote.h
+// (+) #include <Arduino.h>
+// (-) #include <Wprogram.h>
+
+//             0
+//             1
+//RF24-IRQ     2
+//IR_RECEIVER  3
+//             4
+//             5
+//SWITCH_HOME  6
+//ENCODER      7
+//RF24-CE      8
+//RF24-CSN     9
+//BEEPER      10
+//RF24-MOSI   11
+//RF24-MISO   12
+//RF24-SCK    13
+
 #define SWITCH_HOME 6
 #define ENCODER 7
+#define IR_RECEIVER 3
 
 #define BEEPER 10
 
@@ -20,6 +43,7 @@ LabEncoder encoder(ENCODER);
 LabSwitch switchHome(SWITCH_HOME);
 LabDome dome;
 LabBeep beep(BEEPER);
+LabIRReceiver irReceiver(IR_RECEIVER);
 
 void switchHomeEvent() {
   switchHome.callEvent();
@@ -50,9 +74,11 @@ void setup()
   beep.play();
 
   switchHome.setComponent(&encoder);
+  irReceiver.setComponent(&dome);
   
   //dome.setHome(&switchHome);
   dome.setRadio(&radio);
+  dome.setIRReceiver(&irReceiver);
 
   setupIrq();
 
@@ -62,6 +88,7 @@ void setup()
 }
 
 void loop() {
+  irReceiver.decode();
   dome.doTest();
   printf("\n\r");
   delay(5000);

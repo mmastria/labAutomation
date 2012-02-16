@@ -10,6 +10,21 @@
 #include "LabBeep.h"
 #include "printf.h"
 
+//              0
+//              1
+//RF24-IRQ      2
+//              3
+//RELAY_OPEN    4
+//RELAY_CLOSE   5
+//SWITCH_OPENED 6
+//SWITCH_CLOSED 7
+//RF24-CE       8
+//RF24-CSN      9
+//BEEPER       10
+//RF24-MOSI    11
+//RF24-MISO    12
+//RF24-SCK     13
+
 #define SWITCH_OPENED 6
 #define SWITCH_CLOSED 7
 

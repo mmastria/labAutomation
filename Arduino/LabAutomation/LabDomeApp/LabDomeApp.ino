@@ -54,7 +54,7 @@ void encoderEvent() {
 }
 
 void domeEvent() {
-  beep.play();
+  //beep.play();
   dome.callEvent();
 }
 
@@ -71,7 +71,7 @@ void setup()
   printf("\n\rLabDomeApp\n\r");
   printf("release 0.1 - 2012-feb-11\n\r");
   printf("serial log 57600,n,8,1,p\n\r\n\r");
-  beep.play();
+  //beep.play();
 
   switchHome.setComponent(&encoder);
   irReceiver.setComponent(&dome);
@@ -88,9 +88,9 @@ void setup()
 }
 
 void loop() {
-  irReceiver.decode();
+  //irReceiver.decode();
   dome.doTest();
-  printf("\n\r");
+  printf("\n\r--------------------\r\n");
   delay(5000);
 }
 

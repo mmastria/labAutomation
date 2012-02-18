@@ -10,7 +10,7 @@ do
     mv $j ..
     ln -s ../$j
   done
-  ls -lah
+  #ls -lah
   echo .
   echo . ...............................
   echo .

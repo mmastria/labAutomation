@@ -52,7 +52,8 @@ void switchClosedEvent() {
 }
 
 void shutterEvent() {
-  beep.play();
+  //beep.play();
+  printf("> shutterEvent\n\r");
   shutter.callEvent();
 }
 
@@ -68,7 +69,7 @@ void setup() {
   printf("\n\rLabShutterApp\n\r");
   printf("release 0.1 - 2012-feb-11\n\r");
   printf("serial log 57600,n,8,1,p\n\r\n\r");
-  beep.play();
+  //beep.play();
 
   switchOpened.setComponent(&relayOpen);
   switchClosed.setComponent(&relayClose);

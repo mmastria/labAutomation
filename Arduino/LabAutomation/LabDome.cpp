@@ -1,5 +1,13 @@
 #include "LabDome.h"
 
+///////////////////////////////////
+// REMOVER -- APENAS PARA TESTES
+//#include "LabBeep.h"
+//#define BEEPER 10
+//LabBeep beepx(BEEPER);
+///////////////////////////////////
+
+
 LabDome::LabDome() {
 }
 
@@ -7,15 +15,16 @@ void LabDome::doEvent() {
   bool tx, fail, rx;
   _radioPtr->whatHappened(tx, fail, rx);
   if (tx)  {
-    printf("<tx> Data Sent OK\n\r");
+    printf("<tx> Data Sent OK: %s\n\r", command.getName());
   }
   if (fail) {
-    printf("<fail> Data Failed to Sent\n\r");
+    printf("<fail> Data Failed to Sent: %s\n\r", command.getName());
   }
   if (tx || fail) {
-    _radioPtr->powerDown();
+    //_radioPtr->powerDown();
   }
   if (rx) {
+    printf("<rx> ...");
     unsigned long started_waiting_at = millis();
     bool timeout = false;
     bool done = false;
@@ -56,26 +65,32 @@ void LabDome::doTest() {
   command.cmd=SHUTTER_EVENT_OPEN;
   printf("\n\r> Call: %s\n\r", command.getName());
   _radioPtr->startWrite(&command, sizeof(command));
+  //beepx.play();
   delay_ms(4000);
 
   command.cmd=SHUTTER_EVENT_STOP;
   printf("\n\r> Call: %s\n\r", command.getName());
   _radioPtr->startWrite(&command, sizeof(command));
+  //beepx.play();
   delay_ms(4000);
 
   command.cmd=SHUTTER_EVENT_CLOSE;
   printf("\n\r> Call: %s\n\r", command.getName());
   _radioPtr->startWrite(&command, sizeof(command));
+  //beepx.play();
   delay_ms(4000);
 
   command.cmd=SHUTTER_STATE;
   printf("\n\r> Call: %s\n\r", command.getName());
   _radioPtr->startWrite(&command, sizeof(command));
+  //beepx.play();
   delay_ms(4000);
 
   command.cmd=SHUTTER_EVENT_STOP;
   printf("\n\r> Call: %s\n\r", command.getName());
   _radioPtr->startWrite(&command, sizeof(command));
+  //beepx.play();
+  //beepx.play();
   delay_ms(4000);
 
 }

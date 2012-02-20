@@ -7,7 +7,6 @@
 #include "LabRelay.h"
 #include "LabMotor.h"
 #include "LabShutter.h"
-#include "LabBeep.h"
 #include "printf.h"
 
 //              0
@@ -20,7 +19,7 @@
 //SWITCH_CLOSED 7
 //RF24-CE       8
 //RF24-CSN      9
-//BEEPER       10
+//             10
 //RF24-MOSI    11
 //RF24-MISO    12
 //RF24-SCK     13
@@ -31,8 +30,6 @@
 #define RELAY_OPEN 4
 #define RELAY_CLOSE 5
 
-#define BEEPER 10
-
 RF24 radio(8,9);
 
 LabSwitch switchOpened(SWITCH_OPENED);
@@ -41,7 +38,6 @@ LabRelay relayOpen(RELAY_OPEN);
 LabRelay relayClose(RELAY_CLOSE);
 LabMotor motor;
 LabShutter shutter;
-LabBeep beep(BEEPER);
 
 void switchOpenedEvent() {
   switchOpened.callEvent();
@@ -60,9 +56,8 @@ void setup() {
   Serial.begin(57600);
   printf_begin();
   printf("\n\rLabShutterApp\n\r");
-  printf("release 0.1 - 2012-feb-11\n\r");
+  printf("release 0.3 - 2012-feb-20\n\r");
   printf("serial log 57600,n,8,1,p\n\r\n\r");
-  //beep.play();
 
   switchOpened.setComponent(&relayOpen);
   switchClosed.setComponent(&relayClose);

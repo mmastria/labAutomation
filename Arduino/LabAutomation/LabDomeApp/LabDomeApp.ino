@@ -6,7 +6,6 @@
 #include <PinChangeIntConfig.h>
 #include "LabSwitch.h"
 #include "LabEncoder.h"
-#include "LabIrReceiver.h"
 #include "LabDome.h"
 #include "LabBeep.h"
 #include "printf.h"
@@ -37,12 +36,12 @@
 #define BEEPER 10
 
 RF24 radio(8,9);
+IRrecv irrecv(IR_RECEIVER);
 
 LabEncoder encoder(ENCODER);
 LabSwitch switchHome(SWITCH_HOME);
 LabDome dome;
 LabBeep beep(BEEPER);
-LabIRReceiver irReceiver(IR_RECEIVER);
 
 void switchHomeEvent() {
   switchHome.callEvent();
@@ -62,17 +61,16 @@ void setup()
   Serial.begin(57600);
   printf_begin();
   printf("\n\rLabDomeApp\n\r");
-  printf("release 0.2 - 2012-feb-20\n\r");
+  printf("release 0.3 - 2012-feb-20\n\r");
   printf("serial log 57600,n,8,1,p\n\r\n\r");
 
   switchHome.setComponent(&encoder);
-  irReceiver.setComponent(&dome);
   
   //dome.setHome(&switchHome);
   dome.setRadio(&radio);
-  dome.setIRReceiver(&irReceiver);
 
   setupIrq();
+  irrecv.enableIRIn();
 
   printf("> setup OK; ready!\n\r\n\r");
   beep.play();
@@ -80,17 +78,48 @@ void setup()
   delay(2000);
 }
 
-int i = 1;
+void irCheck() {
+  decode_results results;
+  if(irrecv.decode(&results)) {
+    if(results.decode_type == NEC) {
+      switch(results.value) {
+        case 0xFF22DD: // [<<] Dome Left
+          beep.play();
+          break;
+        case 0xFF02FD: // [>>] Dome Right
+          beep.play();
+          break;
+        case 0xFFC23D: // [>||] Stop Dome
+          beep.play();
+          break;
+        case 0xFFE01F: // [-] Close Shutter
+          beep.play();
+          dome.shutterClose();
+          dome.checkRx();
+          break;
+        case 0xFFA857: // [+] Open Shutter
+          beep.play();
+          dome.shutterOpen();
+          dome.checkRx();
+          break;
+        case 0xFF906F: // [EQ] Stop Shutter
+          beep.play();
+          dome.shutterStop();
+          dome.checkRx();
+          break;
+        default:
+          beep.play();
+          delay(50);
+          beep.play();
+          dome.shutterState();
+          dome.checkRx();
+      }
+    }
+    irrecv.resume();
+  }
+}  
 
 void loop() {
-  irReceiver.decode();
-//  i++;
-//  if(i>=9) {
-//    i=1;
-//    printf("\n\r--------------------\r\n");
-//  }
-//  dome.doTest(i);
-//  dome.checkRx();
-//  delay(500);
+  irCheck();
 }
 

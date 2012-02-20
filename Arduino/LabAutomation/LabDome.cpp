@@ -30,26 +30,30 @@ void LabDome::setRadio(RF24 *radioPtr) {
   }
 }
 
-void LabDome::setIRReceiver(LabIRReceiver *irReceiverPtr) {
-  if (irReceiverPtr!=NULL) {
-    _irReceiverPtr=irReceiverPtr;
-  }
-}
-
-void LabDome::doTest(int i) {
-  switch(i) {
-    case 1: command.cmd=SHUTTER_EVENT_OPEN; break;     // Opening, Opened
-    case 2: command.cmd=SHUTTER_STATE; break;
-    case 3: command.cmd=SHUTTER_EVENT_STOP; break;     // Semi-Opened, Opened, Closed
-    case 4: command.cmd=SHUTTER_STATE; break;
-    case 5: command.cmd=SHUTTER_EVENT_CLOSE; break;    // Closing, Closed
-    case 6: command.cmd=SHUTTER_STATE; break;
-    case 7: command.cmd=SHUTTER_EVENT_STOP; break;     // Semi-Opened, Closed, Opened
-    case 8: command.cmd=SHUTTER_STATE; break;
-  }
+void LabDome::sendEvent() {
   printf("\n\r> Call: %s\n\r", command.getName());
   _radioPtr->stopListening();
   _radioPtr->write(&command, sizeof(command));
   _radioPtr->startListening();
+}
+
+void LabDome::shutterOpen() {
+  command.cmd=SHUTTER_EVENT_OPEN;
+  sendEvent();
+}
+
+void LabDome::shutterStop() {
+  command.cmd=SHUTTER_EVENT_STOP;
+  sendEvent();
+}
+
+void LabDome::shutterClose() {
+  command.cmd=SHUTTER_EVENT_CLOSE;
+  sendEvent();
+}
+
+void LabDome::shutterState() {
+  command.cmd=SHUTTER_STATE;
+  sendEvent();
 }
 

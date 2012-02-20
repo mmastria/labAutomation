@@ -15,49 +15,34 @@ void LabShutter::stop() {
   _motorPtr->off();
 }
 
-void LabShutter::doEvent() {
-  bool tx, fail, rx;
-  _radioPtr->whatHappened(tx, fail, rx);
-  if (tx) {
-    printf("<tx> Ack Payload Sent (State: %s)\n\r", command.getName());
-  }
-  if (fail) {
-    printf("<fail> Ack Payload Failed to Sent\n\r");
-  }
-  if (rx) {
-    unsigned long started_waiting_at = millis();
-    bool timeout = false;
+void LabShutter::checkRx() {
+  if (_radioPtr->available()) {
+    printf("---------------------\n\r");
     bool done = false;
-    while (!_radioPtr->available() && !timeout) {
-      if (millis() - started_waiting_at > 250) {
-        timeout = true;
+    while (!done) {
+      done = _radioPtr->read( &command, sizeof(command) );
+      if (!done) {
+        printf("Rx: %s\n\r", command.getName());
       }
     }
-    if (!timeout) {
-      while(!done) {
-        done = _radioPtr->read( &command, sizeof(command) );
-        if (!done) {
-          printf("\n\r<rx> Event: %s\n\r", command.getName());
-        }
-      }
-      printf("\n\r<rx> Last Event: %s\n\r", command.getName());
-      switch(command.cmd) {
-      case SHUTTER_EVENT_STOP:
-        stop();
-        break;
-      case SHUTTER_EVENT_OPEN:
-        open();
-        break;
-      case SHUTTER_EVENT_CLOSE:
-        close();
-        break;
-      }
-      delay_ms(50);  
-      command.cmd = getState();
-//////      _radioPtr->stopListening();
-      _radioPtr->writeAckPayload(1, &command, sizeof(command));
-//////      _radioPtr->startListening();
+    printf("Rx End: %s\n\r", command.getName());
+    switch(command.cmd) {
+    case SHUTTER_EVENT_STOP:
+      stop();
+      break;
+    case SHUTTER_EVENT_OPEN:
+      open();
+      break;
+    case SHUTTER_EVENT_CLOSE:
+      close();
+      break;
     }
+    delay_ms(50);  
+    command.cmd = getState();
+    _radioPtr->stopListening();
+    _radioPtr->write(&command, sizeof(command));
+    printf("Tx: %s\n\r", command.getName());
+    _radioPtr->startListening();
   }
 }
 
@@ -71,9 +56,12 @@ void LabShutter::setRadio(RF24 *radioPtr) {
   if (radioPtr!=NULL) {
     _radioPtr=radioPtr;
     _radioPtr->begin();
-    _radioPtr->enableAckPayload();
+    //_radioPtr->enablePayloads();
+    _radioPtr->setRetries(15,15);
+    _radioPtr->openWritingPipe(pipes[1]);
     _radioPtr->openReadingPipe(1,pipes[0]);
     _radioPtr->startListening();
+    _radioPtr->printDetails();
   }
 }
 

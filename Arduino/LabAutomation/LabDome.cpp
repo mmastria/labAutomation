@@ -1,47 +1,20 @@
 #include "LabDome.h"
 
-///////////////////////////////////
-// REMOVER -- APENAS PARA TESTES
-//#include "LabBeep.h"
-//#define BEEPER 10
-//LabBeep beepx(BEEPER);
-///////////////////////////////////
-
-
 LabDome::LabDome() {
 }
 
-void LabDome::doEvent() {
-  bool tx, fail, rx;
-  _radioPtr->whatHappened(tx, fail, rx);
-  if (tx)  {
-    printf("<tx> Data Sent OK: %s\n\r", command.getName());
+void LabDome::checkRx() {
+  unsigned long started_waiting_at = millis();
+  bool timeout = false;
+  while (!_radioPtr->available() && ! timeout )
+    if (millis() - started_waiting_at > 2000 )
+      timeout = true;
+  if ( timeout ) {
+    printf("Failed, response timed out.\n\r");
   }
-  if (fail) {
-    printf("<fail> Data Failed to Sent: %s\n\r", command.getName());
-  }
-  if (tx || fail) {
-    //_radioPtr->powerDown();
-  }
-  if (rx) {
-    printf("<rx> ...");
-    unsigned long started_waiting_at = millis();
-    bool timeout = false;
-    bool done = false;
-    while (!_radioPtr->isAckPayloadAvailable() && !timeout) {
-      if (millis() - started_waiting_at > 250) {
-        timeout = true;
-      }
-    }
-    if (!timeout) {
-      while(!done) {
-        done = _radioPtr->read( &command, sizeof(command) );
-        if (!done) {
-          printf("<rx> Ack: %s\n\r", command.getName());
-        }
-      }
-      printf("<rx> Last Ack: %s\n\r", command.getName());
-    }
+  else {
+    _radioPtr->read( &command, sizeof(command) );
+    printf("Got response %s\n\r", command.getName());
   }
 }
 
@@ -49,8 +22,11 @@ void LabDome::setRadio(RF24 *radioPtr) {
   if (radioPtr!=NULL) {
     _radioPtr=radioPtr;
     _radioPtr->begin();
-    _radioPtr->enableAckPayload();
+    _radioPtr->setRetries(15,15);
     _radioPtr->openWritingPipe(pipes[0]);
+    _radioPtr->openReadingPipe(1,pipes[1]);
+    _radioPtr->startListening();
+    _radioPtr->printDetails();
   }
 }
 
@@ -60,90 +36,20 @@ void LabDome::setIRReceiver(LabIRReceiver *irReceiverPtr) {
   }
 }
 
-void LabDome::doTest() {
-
-  command.cmd=SHUTTER_EVENT_OPEN;
+void LabDome::doTest(int i) {
+  switch(i) {
+    case 1: command.cmd=SHUTTER_EVENT_OPEN; break;     // Opening, Opened
+    case 2: command.cmd=SHUTTER_STATE; break;
+    case 3: command.cmd=SHUTTER_EVENT_STOP; break;     // Semi-Opened, Opened, Closed
+    case 4: command.cmd=SHUTTER_STATE; break;
+    case 5: command.cmd=SHUTTER_EVENT_CLOSE; break;    // Closing, Closed
+    case 6: command.cmd=SHUTTER_STATE; break;
+    case 7: command.cmd=SHUTTER_EVENT_STOP; break;     // Semi-Opened, Closed, Opened
+    case 8: command.cmd=SHUTTER_STATE; break;
+  }
   printf("\n\r> Call: %s\n\r", command.getName());
-  _radioPtr->startWrite(&command, sizeof(command));
-  //beepx.play();
-  delay_ms(4000);
-
-  command.cmd=SHUTTER_EVENT_STOP;
-  printf("\n\r> Call: %s\n\r", command.getName());
-  _radioPtr->startWrite(&command, sizeof(command));
-  //beepx.play();
-  delay_ms(4000);
-
-  command.cmd=SHUTTER_EVENT_CLOSE;
-  printf("\n\r> Call: %s\n\r", command.getName());
-  _radioPtr->startWrite(&command, sizeof(command));
-  //beepx.play();
-  delay_ms(4000);
-
-  command.cmd=SHUTTER_STATE;
-  printf("\n\r> Call: %s\n\r", command.getName());
-  _radioPtr->startWrite(&command, sizeof(command));
-  //beepx.play();
-  delay_ms(4000);
-
-  command.cmd=SHUTTER_EVENT_STOP;
-  printf("\n\r> Call: %s\n\r", command.getName());
-  _radioPtr->startWrite(&command, sizeof(command));
-  //beepx.play();
-  //beepx.play();
-  delay_ms(4000);
-
+  _radioPtr->stopListening();
+  _radioPtr->write(&command, sizeof(command));
+  _radioPtr->startListening();
 }
-
-
-//------------------------
-
-
-
-
-//void setupRadio() {
-//  radio.begin();
-//  radio.enableAckPayload();
-//  radio.openWritingPipe(pipes[0]);
-//}
-
-//void radioEvent() {
-//  bool tx, fail, rx;
-//  radio.whatHappened(tx, fail, rx);
-//  //if (tx) {
-//  //  Serial.println("Sent OK");
-//  //}
-//  //if (fail) {
-//  //  Serial.println("Sent fail");
-//  //}
-//  if (tx || fail) {
-//    radio.powerDown();
-//  }
-//  if (rx) {
-//    radio.read(&command, sizeof(command));
-//    //Serial.print("Ack:");
-//    //Serial.println(command.cmd);
-//  }
-//}
-
-
-//  command.cmd=CMD_OPEN;
-//  //Serial.println("\nCMD_OPEN");
-//  radio.startWrite(&command, sizeof(command));
-//  delay(5000);
-
-//  command.cmd=CMD_STOP;
-//  //Serial.println("\nCMD_STOP");
-//  radio.startWrite(&command, sizeof(command));
-//  delay(5000);
-
-//  command.cmd=CMD_CLOSE;
-//  //Serial.println("\nCMD_CLOSE");
-//  radio.startWrite(&command, sizeof(command));
-//  delay(5000);
-
-//  command.cmd=CMD_STOP;
-//  Serial.println("CMD_STOP");
-//  radio.write(&command, sizeof(command));
-//  delay(1000);
 

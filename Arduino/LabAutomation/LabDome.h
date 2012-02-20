@@ -15,8 +15,8 @@ class LabDome : public LabComponent {
 	
   LabDome();
    
-  void doEvent();
-  void doTest();
+  void checkRx();
+  void doTest(int i);
    
   void setRadio(RF24 *radioPtr);
   void setIRReceiver(LabIRReceiver *irReceiverPtr);

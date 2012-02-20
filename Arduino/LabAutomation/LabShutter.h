@@ -23,7 +23,7 @@ public:
   void close();
   void stop();
 
-  void doEvent();
+  void checkRx();
 
   void setMotor(LabMotor *motorPtr);
   void setRadio(RF24 *radioPtr);

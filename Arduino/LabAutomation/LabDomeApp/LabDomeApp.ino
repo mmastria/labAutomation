@@ -34,7 +34,6 @@
 #define SWITCH_HOME 6
 #define ENCODER 7
 #define IR_RECEIVER 3
-
 #define BEEPER 10
 
 RF24 radio(8,9);
@@ -53,15 +52,9 @@ void encoderEvent() {
   encoder.callEvent();
 }
 
-void domeEvent() {
-  //beep.play();
-  dome.callEvent();
-}
-
 void setupIrq() {
   PCintPort::attachInterrupt(SWITCH_HOME, switchHomeEvent, RISING);
   PCintPort::attachInterrupt(ENCODER, encoderEvent, RISING);
-  attachInterrupt(0, domeEvent, FALLING);
 }
 
 void setup()
@@ -69,9 +62,8 @@ void setup()
   Serial.begin(57600);
   printf_begin();
   printf("\n\rLabDomeApp\n\r");
-  printf("release 0.1 - 2012-feb-11\n\r");
+  printf("release 0.2 - 2012-feb-20\n\r");
   printf("serial log 57600,n,8,1,p\n\r\n\r");
-  //beep.play();
 
   switchHome.setComponent(&encoder);
   irReceiver.setComponent(&dome);
@@ -83,14 +75,22 @@ void setup()
   setupIrq();
 
   printf("> setup OK; ready!\n\r\n\r");
+  beep.play();
 
   delay(2000);
 }
 
+int i = 1;
+
 void loop() {
-  //irReceiver.decode();
-  dome.doTest();
-  printf("\n\r--------------------\r\n");
-  delay(5000);
+  irReceiver.decode();
+//  i++;
+//  if(i>=9) {
+//    i=1;
+//    printf("\n\r--------------------\r\n");
+//  }
+//  dome.doTest(i);
+//  dome.checkRx();
+//  delay(500);
 }
 

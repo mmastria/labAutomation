@@ -18,7 +18,7 @@ class LabIRReceiver : public LabComponent {
 	
   void translateIR();
   byte _pinIRReceiver;
-  IRrecv *_irrecv;
+  IRrecv *_irrecvPtr;
   decode_results results;
 
 };

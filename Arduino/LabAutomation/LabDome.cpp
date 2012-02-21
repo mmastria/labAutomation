@@ -3,6 +3,18 @@
 LabDome::LabDome() {
 }
 
+void LabDome::right() {
+  _motorPtr->forward();
+}
+
+void LabDome::left() {
+  _motorPtr->reverse();
+}
+
+void LabDome::stop() {
+  _motorPtr->off();
+}
+
 void LabDome::checkRx() {
   unsigned long started_waiting_at = millis();
   bool timeout = false;
@@ -18,6 +30,12 @@ void LabDome::checkRx() {
   }
 }
 
+void LabDome::setMotor(LabMotor *motorPtr) {
+  if (motorPtr!=NULL) {
+    _motorPtr=motorPtr;
+  }
+}
+
 void LabDome::setRadio(RF24 *radioPtr) {
   if (radioPtr!=NULL) {
     _radioPtr=radioPtr;
@@ -26,7 +44,6 @@ void LabDome::setRadio(RF24 *radioPtr) {
     _radioPtr->openWritingPipe(pipes[0]);
     _radioPtr->openReadingPipe(1,pipes[1]);
     _radioPtr->startListening();
-    _radioPtr->printDetails();
   }
 }
 
@@ -55,5 +72,27 @@ void LabDome::shutterClose() {
 void LabDome::shutterState() {
   command.cmd=SHUTTER_STATE;
   sendEvent();
+}
+
+command_e LabDome::getState() {
+  int state = 0;
+  command_e r = DOME_STATE_ERROR;
+  if(_motorPtr->isOff()) state += 1;
+  if(_motorPtr->isForward()) state += 2;
+  if(_motorPtr->isReverse()) state += 4;
+  switch(state) {
+    case 1: // isOff=1  isForward=0  isReverse=0
+      r = DOME_STATE_STOPPED;
+      break;
+    case 2: // isOff=0  isForward=1  isReverse=0
+      r = DOME_STATE_RIGHT;
+      break;
+    case 4: // isOff=0  isForward=0  isReverse=1
+      r = DOME_STATE_LEFT;
+      break;
+    default:
+      r = DOME_STATE_ERROR;
+  }
+  return r;
 }
 

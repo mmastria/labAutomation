@@ -5,6 +5,8 @@
 #include <PinChangeInt.h>
 #include <PinChangeIntConfig.h>
 #include "LabSwitch.h"
+#include "LabRelay.h"
+#include "LabMotor.h"
 #include "LabEncoder.h"
 #include "LabDome.h"
 #include "LabBeep.h"
@@ -19,8 +21,8 @@
 //             1
 //RF24-IRQ     2
 //IR_RECEIVER  3
-//             4
-//             5
+//RELAY_LEFF   4
+//RELAY_RIGHT  5
 //SWITCH_HOME  6
 //ENCODER      7
 //RF24-CE      8
@@ -31,6 +33,10 @@
 //RF24-SCK    13
 
 #define SWITCH_HOME 6
+
+#define RELAY_LEFT 4
+#define RELAY_RIGHT 5
+
 #define ENCODER 7
 #define IR_RECEIVER 3
 #define BEEPER 10
@@ -38,13 +44,19 @@
 RF24 radio(8,9);
 IRrecv irrecv(IR_RECEIVER);
 
+LabBeep beep(BEEPER);
 LabEncoder encoder(ENCODER);
 LabSwitch switchHome(SWITCH_HOME);
+LabRelay relayLeft(RELAY_LEFT);
+LabRelay relayRight(RELAY_RIGHT);
+LabMotor motor;
 LabDome dome;
-LabBeep beep(BEEPER);
+
+void(* resetFunc) (void) = 0; //declare reset function @ address 0
 
 void switchHomeEvent() {
-  switchHome.callEvent();
+  //switchHome.callEvent();
+  printf("Switch Home Event\n\r");
 }
 
 void encoderEvent() {
@@ -61,12 +73,16 @@ void setup()
   Serial.begin(57600);
   printf_begin();
   printf("\n\rLabDomeApp\n\r");
-  printf("release 0.3 - 2012-feb-20\n\r");
+  printf("release 0.4 - 2012-feb-21\n\r");
   printf("serial log 57600,n,8,1,p\n\r\n\r");
 
   switchHome.setComponent(&encoder);
+
+  motor.setRelayForward(&relayRight);
+  motor.setRelayReverse(&relayLeft);
   
   //dome.setHome(&switchHome);
+  dome.setMotor(&motor);
   dome.setRadio(&radio);
 
   setupIrq();
@@ -85,12 +101,15 @@ void irCheck() {
       switch(results.value) {
         case 0xFF22DD: // [<<] Dome Left
           beep.play();
+          dome.left();
           break;
         case 0xFF02FD: // [>>] Dome Right
           beep.play();
+          dome.right();
           break;
         case 0xFFC23D: // [>||] Stop Dome
           beep.play();
+          dome.stop();
           break;
         case 0xFFE01F: // [-] Close Shutter
           beep.play();
@@ -107,9 +126,15 @@ void irCheck() {
           dome.shutterStop();
           dome.checkRx();
           break;
+        case 0xFF629D: // [CH] Reset
+          resetFunc();
+          break;
+        case 0xFFFFFFFF: // discard
+          break;
         default:
+          printf("\n\rCode: %X", results.value);
           beep.play();
-          delay(50);
+          delay(10);
           beep.play();
           dome.shutterState();
           dome.checkRx();

@@ -56,7 +56,7 @@ void setup() {
   Serial.begin(57600);
   printf_begin();
   printf("\n\rLabShutterApp\n\r");
-  printf("release 0.3 - 2012-feb-20\n\r");
+  printf("release 0.4 - 2012-feb-21\n\r");
   printf("serial log 57600,n,8,1,p\n\r\n\r");
 
   switchOpened.setComponent(&relayOpen);

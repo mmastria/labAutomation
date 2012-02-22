@@ -55,6 +55,7 @@ LabRelay relayRight(RELAY_RIGHT);
 LabMotor motor;
 LabDome dome;
 LabDelay _delay;
+int cycle;
 
 void switchHomeEvent() {
 #ifdef __DEBUG__
@@ -74,11 +75,11 @@ void setupIrq() {
 
 void setup()
 {
-  Serial.begin(57600);
+  Serial.begin(9600);
   printf_begin();
   printf("\n\rLabDomeApp\n\r");
   printf("release 0.5 - 2012-feb-22\n\r");
-  printf("serial log 57600,n,8,1,p\n\r\n\r");
+  printf("serial log 9600,n,8,1,p\n\r\n\r");
 #ifdef __DEBUG__
   printf("debug ON\r\n\r\n");
 #else
@@ -96,10 +97,12 @@ void setup()
   setupIrq();
   irrecv.enableIRIn();
 
+  cycle=0;
+  
   printf("> setup OK; ready!\n\r\n\r");
   beep.play();
 
-  _delay.wait(2000);
+  _delay.wait(1000);
 }
 
 void irCheck() {
@@ -110,39 +113,69 @@ void irCheck() {
       switch(results.value) {
         case 0xFF22DD: // [<<] Dome Left
           beep.play();
+#ifdef __DEBUG__
           printf("> Call: dome.left\n\r");
+#endif
           dome.left();
+          commandRx.cmd = dome.getState();
+#ifdef __DEBUG__
+          printf("  St: %s\n\r", commandRx.getName());
+#endif
           break;
         case 0xFF02FD: // [>>] Dome Right
           beep.play();
+#ifdef __DEBUG__
           printf("> Call: dome.right\n\r");
+#endif
           dome.right();
+          commandRx.cmd = dome.getState();
+#ifdef __DEBUG__
+          printf("  St: %s\n\r", commandRx.getName());
+#endif
           break;
         case 0xFFC23D: // [>||] Stop Dome
           beep.play();
+#ifdef __DEBUG__
           printf("> Call: dome.stop\n\r");
+#endif
           dome.stop();
+          commandRx.cmd = dome.getState();
+#ifdef __DEBUG__
+          printf("  St: %s\n\r", commandRx.getName());
+#endif
           break;
         case 0xFFE01F: // [-] Close Shutter
           beep.play();
+#ifdef __DEBUG__
           printf("> Call: shutterClose\n\r");
+#endif
           dome.shutterClose();
           commandRx.cmd = dome.checkRx();
+#ifdef __DEBUG__
           printf("  Rx: %s\n\r", commandRx.getName());
+#endif
           break;
         case 0xFFA857: // [+] Open Shutter
           beep.play();
+#ifdef __DEBUG__
           printf("> Call: shutterOpen\n\r");
+#endif
           dome.shutterOpen();
           commandRx.cmd = dome.checkRx();
+#ifdef __DEBUG__
           printf("  Rx: %s\n\r", commandRx.getName());
+#endif
           break;
         case 0xFF906F: // [EQ] Stop Shutter
           beep.play();
+#ifdef __DEBUG__
           printf("> Call: shutterStop\n\r");
+#endif
           dome.shutterStop();
           commandRx.cmd = dome.checkRx();
+#ifdef __DEBUG__
           printf("  Rx: %s\n\r", commandRx.getName());
+#endif
           break;
         case 0xFFFFFFFF: // discard
           break;
@@ -153,17 +186,115 @@ void irCheck() {
           beep.play();
           _delay.wait(10);
           beep.play();
+#ifdef __DEBUG__
           printf("> Call: shutterState\n\r");
+#endif
           dome.shutterState();
           commandRx.cmd = dome.checkRx();
+#ifdef __DEBUG__
           printf("  Rx: %s\n\r", commandRx.getName());
+#endif
       }
     }
     irrecv.resume();
   }
 }  
 
+void serialCheck() {
+  LabCommand commandRx;
+  int inByte = 0;
+  if(Serial.available() > 0) {
+      inByte = Serial.read();
+      switch(inByte) {
+        case 0x4C: // [L] Dome Left
+          beep.play();
+#ifdef __DEBUG__
+          printf("> Call: dome.left\n\r");
+#endif
+          dome.left();
+          commandRx.cmd = dome.getState();
+#ifdef __DEBUG__
+          printf("  St: %s\n\r", commandRx.getName());
+#endif
+          break;
+        case 0x52: // [R] Dome Right
+          beep.play();
+#ifdef __DEBUG__
+          printf("> Call: dome.right\n\r");
+#endif
+          dome.right();
+          commandRx.cmd = dome.getState();
+#ifdef __DEBUG__
+          printf("  St: %s\n\r", commandRx.getName());
+#endif
+          break;
+        case 0x50: // [P] Stop Dome (Park)
+          beep.play();
+#ifdef __DEBUG__
+          printf("> Call: dome.stop\n\r");
+#endif
+          dome.stop();
+          commandRx.cmd = dome.getState();
+#ifdef __DEBUG__
+          printf("  St: %s\n\r", commandRx.getName());
+#endif
+          break;
+        case 0x44: // [-] Close Shutter (Down)
+          beep.play();
+#ifdef __DEBUG__
+          printf("> Call: shutterClose\n\r");
+#endif
+          dome.shutterClose();
+          commandRx.cmd = dome.checkRx();
+#ifdef __DEBUG__
+          printf("  Rx: %s\n\r", commandRx.getName());
+#endif
+          break;
+        case 0x55: // [+] Open Shutter (Up)
+          beep.play();
+#ifdef __DEBUG__
+          printf("> Call: shutterOpen\n\r");
+#endif
+          dome.shutterOpen();
+          commandRx.cmd = dome.checkRx();
+#ifdef __DEBUG__
+          printf("  Rx: %s\n\r", commandRx.getName());
+#endif
+          break;
+        case 0x53: // [EQ] Stop Shutter (Stop)
+          beep.play();
+#ifdef __DEBUG__
+          printf("> Call: shutterStop\n\r");
+#endif
+          dome.shutterStop();
+          commandRx.cmd = dome.checkRx();
+#ifdef __DEBUG__
+          printf("  Rx: %s\n\r", commandRx.getName());
+#endif
+          break;
+        default:
+#ifdef __DEBUG__
+          printf("\n\rCode: %X\n\r", inByte);
+#endif
+          beep.play();
+          _delay.wait(10);
+          beep.play();
+#ifdef __DEBUG__
+          printf("> Call: shutterState\n\r");
+#endif
+          dome.shutterState();
+          commandRx.cmd = dome.checkRx();
+#ifdef __DEBUG__
+          printf("  Rx: %s\n\r", commandRx.getName());
+#endif
+      }
+  }
+}
+
 void loop() {
-  irCheck();
+  switch(cycle) {
+    case 0: irCheck(); cycle++; break;
+    case 1: serialCheck(); cycle=0; break;
+  }
 }
 

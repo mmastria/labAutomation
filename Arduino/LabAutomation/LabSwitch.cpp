@@ -42,4 +42,3 @@ void LabSwitch::encoderReset() {
   _encoderPtr->reset();
 }
 
-

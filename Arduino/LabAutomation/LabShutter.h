@@ -23,18 +23,22 @@ public:
   void stop();
 
   void checkRx();
+  void doEvent();
+  void setState();
 
   void setMotor(LabMotor *motorPtr);
   void setRadio(RF24 *radioPtr);
   void setBeeper(LabBeep *beepPtr);
 
-  command_e getState();
-
 private:
 
+  command_e getState();
   LabMotor *_motorPtr;
   RF24 *_radioPtr;
   LabBeep *_beepPtr;
+  volatile command_e _lastEvent;
+  volatile command_e _lastState;
+  volatile boolean _listenOn;
 
 };
 

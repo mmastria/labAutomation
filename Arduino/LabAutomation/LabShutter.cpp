@@ -2,6 +2,9 @@
 #include "debug.h"
 
 LabShutter::LabShutter() {
+  _lastEvent = SHUTTER_EVENT;
+  _lastState = SHUTTER_STATE;
+  _listenOn = true;
 }
 
 void LabShutter::open() {
@@ -23,33 +26,47 @@ void LabShutter::checkRx() {
 #endif
     LabCommand commandRx;
     _radioPtr->read( &commandRx, sizeof(commandRx) );
+    _radioPtr->stopListening();
+    _listenOn = false;
 #ifdef __DEBUG__
     printf("Rx: %s\n\r", commandRx.getName());
 #endif
-    switch(commandRx.cmd) {
-      case SHUTTER_EVENT_STOP:
-        _beepPtr->play();
-        stop();
-        break;
-      case SHUTTER_EVENT_OPEN:
-        _beepPtr->play();
-        open();
-        break;
-      case SHUTTER_EVENT_CLOSE:
-        _beepPtr->play();
-        close();
-        break;
-      default:
-        _beepPtr->play();
-    }
+    _lastEvent = commandRx.cmd;
+    _beepPtr->play();
     LabCommand commandTx;
-    commandTx.cmd = getState();
-    _radioPtr->stopListening();
+    if(commandRx.cmd == SHUTTER_STATE) {
+      commandTx.cmd = _lastState;
+    }
+    else {
+      commandTx.cmd = SHUTTER_EVENT;
+    }
     _radioPtr->write(&commandTx, sizeof(commandTx));
 #ifdef __DEBUG__
     printf("Tx: %s\n\r", commandTx.getName());
 #endif
+  }
+}
+
+void LabShutter::doEvent() {
+    switch(_lastEvent) {
+      case SHUTTER_EVENT_STOP:
+        stop();
+        break;
+      case SHUTTER_EVENT_OPEN:
+        open();
+        break;
+      case SHUTTER_EVENT_CLOSE:
+        close();
+        break;
+    }
+    _lastEvent = SHUTTER_EVENT;
+}
+
+void LabShutter::setState() {
+  _lastState = getState();
+  if(!_listenOn) {
     _radioPtr->startListening();
+    _listenOn=true;
   }
 }
 

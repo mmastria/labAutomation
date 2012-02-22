@@ -16,11 +16,11 @@ void LabDome::stop() {
 }
 
 command_e LabDome::checkRx() {
-  command_e r = DOME_STATE_ERROR;  
+  command_e r = SHUTTER_STATE_ERROR;  
   unsigned long started_waiting_at = millis();
   bool timeout = false;
   while (!_radioPtr->available() && ! timeout )
-    if (millis() - started_waiting_at > 3000 )
+    if (millis() - started_waiting_at > 500 )
       timeout = true;
   if ( !timeout ) {
     LabCommand commandRx;

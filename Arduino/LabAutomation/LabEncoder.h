@@ -2,18 +2,16 @@
 #define __LAB_ENCODER__
 
 #include <Arduino.h>
-#include "LabComponent.h"
 
-class LabEncoder : public LabComponent {
+class LabEncoder {
 
   public:
 
   LabEncoder();
   LabEncoder(byte pinEncoder);
 
-  void doEvent();
   void reset();
-
+  void add();
   long getValue();
 
   private:

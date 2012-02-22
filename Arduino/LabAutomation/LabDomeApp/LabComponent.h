@@ -1,1 +1,0 @@
-../LabComponent.h

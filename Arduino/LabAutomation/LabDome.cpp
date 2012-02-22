@@ -15,19 +15,19 @@ void LabDome::stop() {
   _motorPtr->off();
 }
 
-void LabDome::checkRx() {
+command_e LabDome::checkRx() {
+  command_e r = DOME_STATE_ERROR;  
   unsigned long started_waiting_at = millis();
   bool timeout = false;
   while (!_radioPtr->available() && ! timeout )
-    if (millis() - started_waiting_at > 2000 )
+    if (millis() - started_waiting_at > 3000 )
       timeout = true;
-  if ( timeout ) {
-    printf("Failed, response timed out.\n\r");
+  if ( !timeout ) {
+    LabCommand commandRx;
+    _radioPtr->read( &commandRx, sizeof(commandRx) );
+    r = commandRx.cmd;
   }
-  else {
-    _radioPtr->read( &command, sizeof(command) );
-    printf("Got response %s\n\r", command.getName());
-  }
+  return r;
 }
 
 void LabDome::setMotor(LabMotor *motorPtr) {
@@ -47,31 +47,34 @@ void LabDome::setRadio(RF24 *radioPtr) {
   }
 }
 
-void LabDome::sendEvent() {
-  printf("\n\r> Call: %s\n\r", command.getName());
+void LabDome::sendEvent(LabCommand *commandTx, long size) {
   _radioPtr->stopListening();
-  _radioPtr->write(&command, sizeof(command));
+  _radioPtr->write(commandTx, size);
   _radioPtr->startListening();
 }
 
 void LabDome::shutterOpen() {
-  command.cmd=SHUTTER_EVENT_OPEN;
-  sendEvent();
+  LabCommand commandTx;
+  commandTx.cmd=SHUTTER_EVENT_OPEN;
+  sendEvent(&commandTx, sizeof(commandTx));
 }
 
 void LabDome::shutterStop() {
-  command.cmd=SHUTTER_EVENT_STOP;
-  sendEvent();
+  LabCommand commandTx;
+  commandTx.cmd=SHUTTER_EVENT_STOP;
+  sendEvent(&commandTx, sizeof(commandTx));
 }
 
 void LabDome::shutterClose() {
-  command.cmd=SHUTTER_EVENT_CLOSE;
-  sendEvent();
+  LabCommand commandTx;
+  commandTx.cmd=SHUTTER_EVENT_CLOSE;
+  sendEvent(&commandTx, sizeof(commandTx));
 }
 
 void LabDome::shutterState() {
-  command.cmd=SHUTTER_STATE;
-  sendEvent();
+  LabCommand commandTx;
+  commandTx.cmd=SHUTTER_STATE;
+  sendEvent(&commandTx, sizeof(commandTx));
 }
 
 command_e LabDome::getState() {

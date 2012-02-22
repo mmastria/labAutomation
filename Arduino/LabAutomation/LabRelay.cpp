@@ -33,7 +33,3 @@ boolean LabRelay::isOff() {
   return !isOn();
 }
 
-void LabRelay::doEvent() {
-  off();
-}
-

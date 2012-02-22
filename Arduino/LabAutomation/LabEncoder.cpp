@@ -14,7 +14,7 @@ long LabEncoder::getValue() {
   return _value;
 }
 
-void LabEncoder::doEvent() {
+void LabEncoder::add() {
   if(_value>=0) {
     _value++;
   }

@@ -10,7 +10,10 @@
 #include "LabEncoder.h"
 #include "LabDome.h"
 #include "LabBeep.h"
+#include "LabDelay.h"
+#include "LabCommand.h"
 #include "printf.h"
+#include "debug.h"
 
 //
 // alterar IRRemote.h
@@ -51,16 +54,17 @@ LabRelay relayLeft(RELAY_LEFT);
 LabRelay relayRight(RELAY_RIGHT);
 LabMotor motor;
 LabDome dome;
-
-void(* resetFunc) (void) = 0; //declare reset function @ address 0
+LabDelay _delay;
 
 void switchHomeEvent() {
-  //switchHome.callEvent();
+#ifdef __DEBUG__
   printf("Switch Home Event\n\r");
+#endif
+  switchHome.encoderReset();
 }
 
 void encoderEvent() {
-  encoder.callEvent();
+  encoder.add();
 }
 
 void setupIrq() {
@@ -73,15 +77,19 @@ void setup()
   Serial.begin(57600);
   printf_begin();
   printf("\n\rLabDomeApp\n\r");
-  printf("release 0.4 - 2012-feb-21\n\r");
+  printf("release 0.5 - 2012-feb-22\n\r");
   printf("serial log 57600,n,8,1,p\n\r\n\r");
+#ifdef __DEBUG__
+  printf("debug ON\r\n\r\n");
+#else
+  printf("debug OFF\r\n\r\n");
+#endif
 
-  switchHome.setComponent(&encoder);
+  switchHome.setEncoder(&encoder);
 
   motor.setRelayForward(&relayRight);
   motor.setRelayReverse(&relayLeft);
   
-  //dome.setHome(&switchHome);
   dome.setMotor(&motor);
   dome.setRadio(&radio);
 
@@ -91,53 +99,64 @@ void setup()
   printf("> setup OK; ready!\n\r\n\r");
   beep.play();
 
-  delay(2000);
+  _delay.wait(2000);
 }
 
 void irCheck() {
+  LabCommand commandRx;
   decode_results results;
   if(irrecv.decode(&results)) {
     if(results.decode_type == NEC) {
       switch(results.value) {
         case 0xFF22DD: // [<<] Dome Left
           beep.play();
+          printf("> Call: dome.left\n\r");
           dome.left();
           break;
         case 0xFF02FD: // [>>] Dome Right
           beep.play();
+          printf("> Call: dome.right\n\r");
           dome.right();
           break;
         case 0xFFC23D: // [>||] Stop Dome
           beep.play();
+          printf("> Call: dome.stop\n\r");
           dome.stop();
           break;
         case 0xFFE01F: // [-] Close Shutter
           beep.play();
+          printf("> Call: shutterClose\n\r");
           dome.shutterClose();
-          dome.checkRx();
+          commandRx.cmd = dome.checkRx();
+          printf("  Rx: %s\n\r", commandRx.getName());
           break;
         case 0xFFA857: // [+] Open Shutter
           beep.play();
+          printf("> Call: shutterOpen\n\r");
           dome.shutterOpen();
-          dome.checkRx();
+          commandRx.cmd = dome.checkRx();
+          printf("  Rx: %s\n\r", commandRx.getName());
           break;
         case 0xFF906F: // [EQ] Stop Shutter
           beep.play();
+          printf("> Call: shutterStop\n\r");
           dome.shutterStop();
-          dome.checkRx();
-          break;
-        case 0xFF629D: // [CH] Reset
-          resetFunc();
+          commandRx.cmd = dome.checkRx();
+          printf("  Rx: %s\n\r", commandRx.getName());
           break;
         case 0xFFFFFFFF: // discard
           break;
         default:
-          printf("\n\rCode: %X", results.value);
+#ifdef __DEBUG__
+          printf("\n\rCode: %X\n\r", results.value);
+#endif
           beep.play();
-          delay(10);
+          _delay.wait(10);
           beep.play();
+          printf("> Call: shutterState\n\r");
           dome.shutterState();
-          dome.checkRx();
+          commandRx.cmd = dome.checkRx();
+          printf("  Rx: %s\n\r", commandRx.getName());
       }
     }
     irrecv.resume();

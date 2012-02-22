@@ -2,10 +2,8 @@
 #define __LAB_RELAY__
 
 #include <Arduino.h>
-#include "LabComponent.h"
 
-class LabRelay : 
-public LabComponent {
+class LabRelay {
 
 public:
 
@@ -17,8 +15,6 @@ public:
 
   boolean isOn();
   boolean isOff();
-
-  void doEvent();
 
 private:
 

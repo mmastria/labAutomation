@@ -21,7 +21,25 @@ boolean LabSwitch::isOff() {
   return !isOn();
 }
 
-void LabSwitch::doEvent() {
-  callEvent();
+
+void LabSwitch::setRelay(LabRelay *relayPtr) {
+  if (relayPtr!=NULL) {
+    _relayPtr=relayPtr;
+  }
 }
+
+void LabSwitch::relayOff() {
+  _relayPtr->off();
+}
+
+void LabSwitch::setEncoder(LabEncoder *encoderPtr) {
+  if (encoderPtr!=NULL) {
+    _encoderPtr=encoderPtr;
+  }
+}
+
+void LabSwitch::encoderReset() {
+  _encoderPtr->reset();
+}
+
 

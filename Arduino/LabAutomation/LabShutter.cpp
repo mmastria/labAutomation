@@ -1,4 +1,5 @@
 #include "LabShutter.h"
+#include "debug.h"
 
 LabShutter::LabShutter() {
 }
@@ -17,25 +18,37 @@ void LabShutter::stop() {
 
 void LabShutter::checkRx() {
   if (_radioPtr->available()) {
+#ifdef __DEBUG__
     printf("---------------------\n\r");
-    _radioPtr->read( &command, sizeof(command) );
-    printf("Rx: %s\n\r", command.getName());
-    switch(command.cmd) {
+#endif
+    LabCommand commandRx;
+    _radioPtr->read( &commandRx, sizeof(commandRx) );
+#ifdef __DEBUG__
+    printf("Rx: %s\n\r", commandRx.getName());
+#endif
+    switch(commandRx.cmd) {
       case SHUTTER_EVENT_STOP:
+        _beepPtr->play();
         stop();
         break;
       case SHUTTER_EVENT_OPEN:
+        _beepPtr->play();
         open();
         break;
       case SHUTTER_EVENT_CLOSE:
+        _beepPtr->play();
         close();
         break;
+      default:
+        _beepPtr->play();
     }
-    delay_ms(50);  
-    command.cmd = getState();
+    LabCommand commandTx;
+    commandTx.cmd = getState();
     _radioPtr->stopListening();
-    _radioPtr->write(&command, sizeof(command));
-    printf("Tx: %s\n\r", command.getName());
+    _radioPtr->write(&commandTx, sizeof(commandTx));
+#ifdef __DEBUG__
+    printf("Tx: %s\n\r", commandTx.getName());
+#endif
     _radioPtr->startListening();
   }
 }
@@ -54,6 +67,12 @@ void LabShutter::setRadio(RF24 *radioPtr) {
     _radioPtr->openWritingPipe(pipes[1]);
     _radioPtr->openReadingPipe(1,pipes[0]);
     _radioPtr->startListening();
+  }
+}
+
+void LabShutter::setBeeper(LabBeep *beepPtr) {
+  if (beepPtr!=NULL) {
+    _beepPtr=beepPtr;
   }
 }
 

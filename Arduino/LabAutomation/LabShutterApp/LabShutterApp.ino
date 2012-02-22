@@ -7,44 +7,51 @@
 #include "LabRelay.h"
 #include "LabMotor.h"
 #include "LabShutter.h"
+#include "LabBeep.h"
+#include "LabDelay.h"
 #include "printf.h"
+#include "debug.h"
 
 //              0
 //              1
 //RF24-IRQ      2
 //              3
-//RELAY_OPEN    4
-//RELAY_CLOSE   5
-//SWITCH_OPENED 6
-//SWITCH_CLOSED 7
+//RELAY_CLOSE   4
+//RELAY_OPEN    5
+//SWITCH_CLOSED 6
+//SWITCH_OPENED 7
 //RF24-CE       8
 //RF24-CSN      9
-//             10
+//BEEPER       10
 //RF24-MOSI    11
 //RF24-MISO    12
 //RF24-SCK     13
 
-#define SWITCH_OPENED 6
-#define SWITCH_CLOSED 7
+#define SWITCH_CLOSED 6
+#define SWITCH_OPENED 7
 
-#define RELAY_OPEN 4
-#define RELAY_CLOSE 5
+#define RELAY_CLOSE 4
+#define RELAY_OPEN 5
+
+#define BEEPER 10
 
 RF24 radio(8,9);
 
+LabBeep beep(BEEPER);
 LabSwitch switchOpened(SWITCH_OPENED);
 LabSwitch switchClosed(SWITCH_CLOSED);
 LabRelay relayOpen(RELAY_OPEN);
 LabRelay relayClose(RELAY_CLOSE);
 LabMotor motor;
 LabShutter shutter;
+LabDelay _delay;
 
 void switchOpenedEvent() {
-  switchOpened.callEvent();
+  switchOpened.relayOff();
 }
 
 void switchClosedEvent() {
-  switchClosed.callEvent();
+  switchClosed.relayOff();
 }
 
 void setupIrq() {
@@ -56,11 +63,16 @@ void setup() {
   Serial.begin(57600);
   printf_begin();
   printf("\n\rLabShutterApp\n\r");
-  printf("release 0.4 - 2012-feb-21\n\r");
+  printf("release 0.5 - 2012-feb-22\n\r");
   printf("serial log 57600,n,8,1,p\n\r\n\r");
+#ifdef __DEBUG__
+  printf("debug ON\r\n\r\n");
+#else
+  printf("debug OFF\r\n\r\n");
+#endif
 
-  switchOpened.setComponent(&relayOpen);
-  switchClosed.setComponent(&relayClose);
+  switchOpened.setRelay(&relayOpen);
+  switchClosed.setRelay(&relayClose);
 
   motor.setSwitchForward(&switchOpened);
   motor.setSwitchReverse(&switchClosed);
@@ -69,12 +81,14 @@ void setup() {
 
   shutter.setMotor(&motor);
   shutter.setRadio(&radio);
+  shutter.setBeeper(&beep);
 
   setupIrq();
 
   printf("> setup OK; ready!\n\r\n\r");
+  beep.play();
 
-  delay(2000);
+  _delay.wait(2000);
 }
 
 

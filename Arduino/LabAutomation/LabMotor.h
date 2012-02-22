@@ -2,12 +2,11 @@
 #define __LAB_MOTOR__
 
 #include <Arduino.h>
-#include "LabComponent.h"
 #include "LabSwitch.h"
 #include "LabRelay.h"
+#include "LabDelay.h"
 
-class LabMotor : 
-public LabComponent {
+class LabMotor {
 
 public:
 
@@ -35,6 +34,7 @@ private:
   LabSwitch *_switchReversePtr;
   LabRelay *_relayForwardPtr;
   LabRelay *_relayReversePtr;
+  LabDelay _delay;
 
 };
 

@@ -75,11 +75,11 @@ void setupIrq() {
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(57600);
   printf_begin();
   printf("\n\rLabDomeApp\n\r");
   printf("release 0.5 - 2012-feb-22\n\r");
-  printf("serial log 9600,n,8,1,p\n\r\n\r");
+  printf("serial log 57600,n,8,1,p\n\r\n\r");
 #ifdef __DEBUG__
   printf("debug ON\r\n\r\n");
 #else
@@ -177,6 +177,17 @@ void irCheck() {
           printf("  Rx: %s\n\r", commandRx.getName());
 #endif
           break;
+        case 0xFFA25D: // [CH-] Get Temperature/Humidity
+          beep.play();
+#ifdef __DEBUG__
+          printf("> Call: getTH\n\r");
+#endif
+          dome.getTH();
+          commandRx.cmd = dome.checkRx();
+#ifdef __DEBUG__
+          printf("  Rx: %s\n\r", commandRx.getName());
+#endif
+          break;
         case 0xFFFFFFFF: // discard
           break;
         default:
@@ -267,6 +278,17 @@ void serialCheck() {
           printf("> Call: shutterStop\n\r");
 #endif
           dome.shutterStop();
+          commandRx.cmd = dome.checkRx();
+#ifdef __DEBUG__
+          printf("  Rx: %s\n\r", commandRx.getName());
+#endif
+          break;
+        case 0x54: // [CH-] Get Temperature/Humidity (Temp)
+          beep.play();
+#ifdef __DEBUG__
+          printf("> Call: getTH\n\r");
+#endif
+          dome.getTH();
           commandRx.cmd = dome.checkRx();
 #ifdef __DEBUG__
           printf("  Rx: %s\n\r", commandRx.getName());

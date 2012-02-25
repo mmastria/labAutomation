@@ -9,8 +9,7 @@
 #include "LabBeep.h"
 #include "LabCommand.h"
 
-const uint64_t pipes[4] = { 
-  0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL, 0xF0F0F0F0C3LL, 0xF0F0F0F0B4LL };
+const uint64_t pipesDomeShutter[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 
 class LabShutter {
 

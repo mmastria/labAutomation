@@ -19,6 +19,8 @@ command_e LabDome::checkRx() {
   command_e r = SHUTTER_STATE_ERROR;  
   unsigned long started_waiting_at = millis();
   bool timeout = false;
+//  uint8_t pipe_num;
+//  while (!_radioPtr->available(&pipe_num) && ! timeout )
   while (!_radioPtr->available() && ! timeout )
     if (millis() - started_waiting_at > 500 )
       timeout = true;
@@ -41,14 +43,27 @@ void LabDome::setRadio(RF24 *radioPtr) {
     _radioPtr=radioPtr;
     _radioPtr->begin();
     _radioPtr->setRetries(15,15);
-    _radioPtr->openWritingPipe(pipes[0]);
-    _radioPtr->openReadingPipe(1,pipes[1]);
+    //_radioPtr->openWritingPipe(pipesDomeShutter[0]);
+    _radioPtr->openReadingPipe(1,pipesDomeShutter[1]);
+    //_radioPtr->openWritingPipe(pipesDomeScope[0]);
+    _radioPtr->openReadingPipe(2,pipesDomeScope[1]);
     _radioPtr->startListening();
   }
 }
 
-void LabDome::sendEvent(LabCommand *commandTx, long size) {
+void LabDome::sendEventShutter(LabCommand *commandTx, long size) {
   _radioPtr->stopListening();
+  _radioPtr->openWritingPipe(pipesDomeShutter[0]);
+  sendEvent(commandTx, size);
+}
+
+void LabDome::sendEventScope(LabCommand *commandTx, long size) {
+  _radioPtr->stopListening();
+  _radioPtr->openWritingPipe(pipesDomeScope[0]);
+  sendEvent(commandTx, size);
+}
+
+void LabDome::sendEvent(LabCommand *commandTx, long size) {
   _radioPtr->write(commandTx, size);
   _radioPtr->startListening();
 }
@@ -56,25 +71,25 @@ void LabDome::sendEvent(LabCommand *commandTx, long size) {
 void LabDome::shutterOpen() {
   LabCommand commandTx;
   commandTx.cmd=SHUTTER_EVENT_OPEN;
-  sendEvent(&commandTx, sizeof(commandTx));
+  sendEventShutter(&commandTx, sizeof(commandTx));
 }
 
 void LabDome::shutterStop() {
   LabCommand commandTx;
   commandTx.cmd=SHUTTER_EVENT_STOP;
-  sendEvent(&commandTx, sizeof(commandTx));
+  sendEventShutter(&commandTx, sizeof(commandTx));
 }
 
 void LabDome::shutterClose() {
   LabCommand commandTx;
   commandTx.cmd=SHUTTER_EVENT_CLOSE;
-  sendEvent(&commandTx, sizeof(commandTx));
+  sendEventShutter(&commandTx, sizeof(commandTx));
 }
 
 void LabDome::shutterState() {
   LabCommand commandTx;
   commandTx.cmd=SHUTTER_STATE;
-  sendEvent(&commandTx, sizeof(commandTx));
+  sendEventShutter(&commandTx, sizeof(commandTx));
 }
 
 command_e LabDome::getState() {
@@ -97,5 +112,11 @@ command_e LabDome::getState() {
       r = DOME_STATE_ERROR;
   }
   return r;
+}
+
+void LabDome::getTH() {
+  LabCommand commandTx;
+  commandTx.cmd=SCOPE_EVENT_GETTH;
+  sendEventScope(&commandTx, sizeof(commandTx));
 }
 

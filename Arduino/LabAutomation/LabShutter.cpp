@@ -81,8 +81,8 @@ void LabShutter::setRadio(RF24 *radioPtr) {
     _radioPtr=radioPtr;
     _radioPtr->begin();
     _radioPtr->setRetries(15,15);
-    _radioPtr->openWritingPipe(pipes[1]);
-    _radioPtr->openReadingPipe(1,pipes[0]);
+    _radioPtr->openWritingPipe(pipesDomeShutter[1]);
+    _radioPtr->openReadingPipe(1,pipesDomeShutter[0]);
     _radioPtr->startListening();
   }
 }

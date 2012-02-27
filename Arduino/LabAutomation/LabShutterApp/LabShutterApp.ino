@@ -64,7 +64,7 @@ void setup() {
   Serial.begin(9600);
   printf_begin();
   printf("\n\rLabShutterApp\n\r");
-  printf("release 0.5 - 2012-feb-22\n\r");
+  printf("release 0.6 - 2012-feb-25\n\r");
   printf("serial log 9600,n,8,1,p\n\r\n\r");
 #ifdef __DEBUG__
   printf("debug ON\r\n\r\n");

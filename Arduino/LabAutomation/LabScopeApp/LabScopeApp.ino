@@ -1,13 +1,19 @@
 #include <SPI.h>
+#include <PString.h>
 #include "nRF24L01.h"
 #include "RF24.h"
+#include "dht.h"
 #include <PinChangeInt.h>
 #include <PinChangeIntConfig.h>
 #include "LabScope.h"
+#include "LabPsd.h"
 #include "LabDelay.h"
 #include "LabCommand.h"
 #include "printf.h"
 #include "debug.h"
+
+//PSD-LEFT    A0
+//PSD-RIGHT   A1
 
 //             0
 //             1
@@ -24,13 +30,22 @@
 //RF24-MISO   12
 //RF24-SCK    13
 
-#define DHT22 5
+#define DHT22       5
+#define PSD_LEFT    0
+#define PSD_RIGHT   1
 
 RF24 radio(8,9);
+dht dht22;
 
 LabScope scope;
+LabPsd psdLeft(PSD_LEFT);
+LabPsd psdRight(PSD_RIGHT);
 LabDelay _delay;
 int cycle;
+boolean leftBefore;
+boolean leftNow;
+boolean rightBefore;
+boolean rightNow;
 
 void setup()
 {
@@ -45,9 +60,15 @@ void setup()
   printf("debug OFF\r\n\r\n");
 #endif
 
+  psdLeft.setReference(180);
+  psdRight.setReference(180);
   scope.setRadio(&radio);
+  scope.setDht(&dht22, DHT22);
+  
 
   cycle=0;
+  leftBefore=!psdLeft.isWallHit();
+  rightBefore=!psdRight.isWallHit();
   
   printf("> setup OK; ready!\n\r\n\r");
   _delay.wait(1000);
@@ -56,8 +77,19 @@ void setup()
 void loop() {
   switch(cycle) {
     case 0: scope.checkRx(); cycle++; break;
-    case 1: scope.doEvent(); cycle++; break;
-    case 2: scope.setState(); cycle=0; break;
+    case 1: scope.setState(); cycle=0; break;
+  }
+  leftNow=psdLeft.isWallHit();
+  rightNow=psdRight.isWallHit();
+  if(leftNow!=leftBefore) {
+    Serial.print("Left Wall Hit: ");
+    Serial.println(leftNow);
+    leftBefore=leftNow;
+  }
+  if(rightNow!=rightBefore) {
+    Serial.print("Right Wall Hit: ");
+    Serial.println(rightNow);
+    rightBefore=rightNow;
   }
 }
 

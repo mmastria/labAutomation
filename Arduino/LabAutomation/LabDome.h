@@ -26,7 +26,7 @@ class LabDome {
   void setMotor(LabMotor *motorPtr);
   void setRadio(RF24 *radioPtr);
 
-  command_e checkRx();
+  LabCommand *checkRx();
   
   void shutterOpen();
   void shutterStop();

@@ -2,8 +2,8 @@
 #include "debug.h"
 
 LabScope::LabScope() {
-  _lastEvent = SCOPE_EVENT;
-  _lastState = SCOPE_STATE;
+  _temperature = 999.99;
+  _humidity = 999.99;
   _listenOn = true;
 }
 
@@ -19,32 +19,34 @@ void LabScope::checkRx() {
 #ifdef __DEBUG__
     printf("Rx: %s\n\r", commandRx.getName());
 #endif
-    _lastEvent = commandRx.cmd;
     LabCommand commandTx;
-    if(commandRx.cmd == SCOPE_STATE) {
-      commandTx.cmd = _lastState;
+    if(commandRx.cmd == SCOPE_EVENT_GETTH) {
+      commandTx.cmd = SCOPE_STATE_TH;
+      commandTx.temperature = _temperature;
+      commandTx.humidity = _humidity;
     }
     else {
       commandTx.cmd = SCOPE_EVENT;
     }
-    _radioPtr->write(&commandTx, sizeof(commandTx));
 #ifdef __DEBUG__
-    printf("Tx: %s\n\r", commandTx.getName());
+    char humidityBuffer[10];
+    char temperatureBuffer[10];
+    dtostrf(commandTx.humidity, 6,  2,humidityBuffer);
+    dtostrf(commandTx.temperature, 6, 2, temperatureBuffer);
+    printf("TX: %s - H:%s / T:%s\n\r", commandTx.getName(), humidityBuffer, temperatureBuffer);
 #endif
+    _radioPtr->write(&commandTx, sizeof(commandTx));
   }
 }
 
-void LabScope::doEvent() {
-    switch(_lastEvent) {
-      case SCOPE_EVENT_GETTH:
-        break;
-    }
-    _lastEvent = SCOPE_EVENT;
-}
-
 void LabScope::setState() {
-//  _lastState = getState();
-  _lastState = SCOPE_STATE_TH;
+  if(_dhtPtr!=NULL) {
+    _delay.wait(20);
+    if(_dhtPtr->read22(_dhtPin)==0) {
+      _humidity=_dhtPtr->humidity;
+      _temperature=_dhtPtr->temperature;
+    }
+  }
   if(!_listenOn) {
     _radioPtr->startListening();
     _listenOn=true;
@@ -61,4 +63,12 @@ void LabScope::setRadio(RF24 *radioPtr) {
     _radioPtr->startListening();
   }
 }
+
+void LabScope::setDht(dht *dhtPtr, int dhtPin) {
+  if (dhtPtr!=NULL) {
+    _dhtPtr=dhtPtr;
+    _dhtPin=dhtPin;
+  }
+}
+
 

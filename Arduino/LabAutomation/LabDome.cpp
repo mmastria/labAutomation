@@ -15,21 +15,18 @@ void LabDome::stop() {
   _motorPtr->off();
 }
 
-command_e LabDome::checkRx() {
-  command_e r = SHUTTER_STATE_ERROR;  
+LabCommand *LabDome::checkRx() {
   unsigned long started_waiting_at = millis();
   bool timeout = false;
-//  uint8_t pipe_num;
-//  while (!_radioPtr->available(&pipe_num) && ! timeout )
+  LabCommand commandRx;
+  commandRx.cmd = DOME_STATE_ERROR;
   while (!_radioPtr->available() && ! timeout )
     if (millis() - started_waiting_at > 500 )
       timeout = true;
   if ( !timeout ) {
-    LabCommand commandRx;
     _radioPtr->read( &commandRx, sizeof(commandRx) );
-    r = commandRx.cmd;
   }
-  return r;
+  return &commandRx;
 }
 
 void LabDome::setMotor(LabMotor *motorPtr) {
@@ -43,9 +40,7 @@ void LabDome::setRadio(RF24 *radioPtr) {
     _radioPtr=radioPtr;
     _radioPtr->begin();
     _radioPtr->setRetries(15,15);
-    //_radioPtr->openWritingPipe(pipesDomeShutter[0]);
     _radioPtr->openReadingPipe(1,pipesDomeShutter[1]);
-    //_radioPtr->openWritingPipe(pipesDomeScope[0]);
     _radioPtr->openReadingPipe(2,pipesDomeScope[1]);
     _radioPtr->startListening();
   }

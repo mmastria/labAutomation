@@ -9,7 +9,7 @@ typedef enum {
   DOME_EVENT,        DOME_EVENT_STOP, DOME_EVENT_RIGHT, DOME_EVENT_LEFT,
   DOME_STATE,        DOME_STATE_STOPPED, DOME_STATE_RIGHT, DOME_STATE_LEFT, DOME_STATE_ERROR,
   SCOPE_EVENT,       SCOPE_EVENT_GETTH,
-  SCOPE_STATE,       SCOPE_STATE_TH} 
+  SCOPE_STATE,       SCOPE_STATE_TH, SCOPE_STATE_ERROR} 
 command_e;
 
 class LabCommand {
@@ -20,6 +20,8 @@ public:
 
   volatile command_e cmd;
   const char* getName();
+  volatile double humidity;
+  volatile double temperature;
 
 };
 

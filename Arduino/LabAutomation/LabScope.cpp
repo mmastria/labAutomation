@@ -9,16 +9,12 @@ LabScope::LabScope() {
 
 void LabScope::checkRx() {
   if (_radioPtr->available()) {
-#ifdef __DEBUG__
     printf("---------------------\n\r");
-#endif
     LabCommand commandRx;
     _radioPtr->read( &commandRx, sizeof(commandRx) );
     _radioPtr->stopListening();
     _listenOn = false;
-#ifdef __DEBUG__
     printf("Rx: %s\n\r", commandRx.getName());
-#endif
     LabCommand commandTx;
     if(commandRx.cmd == SCOPE_EVENT_GETTH) {
       commandTx.cmd = SCOPE_STATE_TH;
@@ -28,13 +24,11 @@ void LabScope::checkRx() {
     else {
       commandTx.cmd = SCOPE_EVENT;
     }
-#ifdef __DEBUG__
     char humidityBuffer[10];
     char temperatureBuffer[10];
     dtostrf(commandTx.humidity, 6,  2,humidityBuffer);
     dtostrf(commandTx.temperature, 6, 2, temperatureBuffer);
     printf("TX: %s - H:%s / T:%s\n\r", commandTx.getName(), humidityBuffer, temperatureBuffer);
-#endif
     _radioPtr->write(&commandTx, sizeof(commandTx));
   }
 }

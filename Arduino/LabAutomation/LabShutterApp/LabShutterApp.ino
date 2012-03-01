@@ -45,7 +45,6 @@ LabMotor motor;
 LabShutter shutter;
 LabBeep beep(BEEPER);
 LabDelay _delay;
-int cycle;
 
 void switchOpenedEvent() {
   switchOpened.relayOff();
@@ -66,11 +65,8 @@ void setup() {
   printf("\n\rLabShutterApp\n\r");
   printf("release 0.6 - 2012-feb-25\n\r");
   printf("serial log 9600,n,8,1,p\n\r\n\r");
-#ifdef __DEBUG__
   printf("debug ON\r\n\r\n");
-#else
   printf("debug OFF\r\n\r\n");
-#endif
 
   switchOpened.setRelay(&relayOpen);
   switchClosed.setRelay(&relayClose);
@@ -86,8 +82,6 @@ void setup() {
 
   setupIrq();
 
-  cycle=0;
-
   printf("> setup OK; ready!\n\r\n\r");
   beep.play();
 
@@ -95,10 +89,8 @@ void setup() {
 }
 
 void loop() {
-  switch(cycle) {
-    case 0: shutter.checkRx(); cycle++; break;
-    case 1: shutter.doEvent(); cycle++; break;
-    case 2: shutter.setState(); cycle=0; break;
-  }
+  shutter.checkRx();
+  shutter.doEvent();
+  shutter.setState();
 }
 

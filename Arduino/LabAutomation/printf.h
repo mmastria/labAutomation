@@ -18,8 +18,9 @@
 
 int serial_putc( char c, FILE * ) 
 {
+#ifdef __DEBUG__
   Serial.write( c );
-
+#endif
   return c;
 } 
 

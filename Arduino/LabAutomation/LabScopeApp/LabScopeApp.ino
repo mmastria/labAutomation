@@ -6,14 +6,14 @@
 #include <PinChangeInt.h>
 #include <PinChangeIntConfig.h>
 #include "LabScope.h"
-#include "LabPsd.h"
+#include "LabIrSharp.h"
 #include "LabDelay.h"
 #include "LabCommand.h"
 #include "printf.h"
 #include "debug.h"
 
-//PSD-LEFT    A0
-//PSD-RIGHT   A1
+//IRS-LEFT    A0
+//IRS-RIGHT   A1
 
 //             0
 //             1
@@ -31,17 +31,16 @@
 //RF24-SCK    13
 
 #define DHT22       5
-#define PSD_LEFT    0
-#define PSD_RIGHT   1
+#define IRSHARP_LEFT    0
+#define IRSHARP_RIGHT   1
 
 RF24 radio(8,9);
 dht dht22;
 
 LabScope scope;
-LabPsd psdLeft(PSD_LEFT);
-LabPsd psdRight(PSD_RIGHT);
+LabIrSharp irSharpLeft(IRSHARP_LEFT);
+LabIrSharp irSharpRight(IRSHARP_RIGHT);
 LabDelay _delay;
-int cycle;
 boolean leftBefore;
 boolean leftNow;
 boolean rightBefore;
@@ -54,33 +53,25 @@ void setup()
   printf("\n\rLabScopeApp\n\r");
   printf("release 0.6 - 2012-feb-25\n\r");
   printf("serial log 57600,n,8,1,p\n\r\n\r");
-#ifdef __DEBUG__
-  printf("debug ON\r\n\r\n");
-#else
-  printf("debug OFF\r\n\r\n");
-#endif
 
-  psdLeft.setReference(180);
-  psdRight.setReference(180);
+  irSharpLeft.setReference(180);
+  irSharpRight.setReference(180);
   scope.setRadio(&radio);
   scope.setDht(&dht22, DHT22);
-  
 
-  cycle=0;
-  leftBefore=!psdLeft.isWallHit();
-  rightBefore=!psdRight.isWallHit();
+  leftBefore=!irSharpLeft.isWallHit();
+  rightBefore=!irSharpRight.isWallHit();
   
   printf("> setup OK; ready!\n\r\n\r");
   _delay.wait(1000);
 }
 
 void loop() {
-  switch(cycle) {
-    case 0: scope.checkRx(); cycle++; break;
-    case 1: scope.setState(); cycle=0; break;
-  }
-  leftNow=psdLeft.isWallHit();
-  rightNow=psdRight.isWallHit();
+  scope.checkRx(); 
+  scope.setState();
+
+  leftNow=irSharpLeft.isWallHit();
+  rightNow=irSharpRight.isWallHit();
   if(leftNow!=leftBefore) {
     Serial.print("Left Wall Hit: ");
     Serial.println(leftNow);
@@ -92,4 +83,3 @@ void loop() {
     rightBefore=rightNow;
   }
 }
-

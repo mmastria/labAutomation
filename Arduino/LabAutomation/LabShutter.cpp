@@ -21,16 +21,12 @@ void LabShutter::stop() {
 
 void LabShutter::checkRx() {
   if (_radioPtr->available()) {
-#ifdef __DEBUG__
     printf("---------------------\n\r");
-#endif
     LabCommand commandRx;
     _radioPtr->read( &commandRx, sizeof(commandRx) );
     _radioPtr->stopListening();
     _listenOn = false;
-#ifdef __DEBUG__
     printf("Rx: %s\n\r", commandRx.getName());
-#endif
     _lastEvent = commandRx.cmd;
     _beepPtr->play();
     LabCommand commandTx;
@@ -41,9 +37,7 @@ void LabShutter::checkRx() {
       commandTx.cmd = SHUTTER_EVENT;
     }
     _radioPtr->write(&commandTx, sizeof(commandTx));
-#ifdef __DEBUG__
     printf("Tx: %s\n\r", commandTx.getName());
-#endif
   }
 }
 

@@ -198,33 +198,35 @@ void switchClosedEvent() {
 #endif
 
 void timer() {
-  millisTimer=millis();
-  #ifdef __CONTROLLER__
-    broker.timer();
-    controller.setLastHumidity(broker.regs[MB_SCOPE_HUMIDITY]);
-    controller.timer();
-    controller.checkAutodes();
-    queue.push((payload_t){CONTROLLER_GETTIMER});
-  #endif
-  #ifdef __DOME__
-    dome.timer();
-    dome.checkSync();
-    queue.push((payload_t){DOME_GETTIMER});
-  #endif
-  #ifdef __SHUTTER__
-    shutter.timer();
-    queue.push((payload_t){SHUTTER_GETTIMER});
-    if(shutter.fullSyncOn()) {
-      queue.push((payload_t){SHUTTER_SENDSYNC});
-    }
-  #endif
-  #ifdef __SCOPE__
-    scope.timer();
-    queue.push((payload_t){SCOPE_GETTIMER});
-    if(scope.fullSyncOn()) {
-      queue.push((payload_t){SCOPE_SENDSYNC});
-    }
-  #endif
+  if(!abortEv) {
+    millisTimer=millis();
+    #ifdef __CONTROLLER__
+      broker.timer();
+      controller.setLastHumidity(broker.regs[MB_SCOPE_HUMIDITY]);
+      controller.timer();
+      controller.checkAutodes();
+      queue.push((payload_t){CONTROLLER_GETTIMER});
+    #endif
+    #ifdef __DOME__
+      dome.timer();
+      dome.checkSync();
+      queue.push((payload_t){DOME_GETTIMER});
+    #endif
+    #ifdef __SHUTTER__
+      shutter.timer();
+      queue.push((payload_t){SHUTTER_GETTIMER});
+      if(shutter.fullSyncOn()) {
+        queue.push((payload_t){SHUTTER_SENDSYNC});
+      }
+    #endif
+    #ifdef __SCOPE__
+      scope.timer();
+      queue.push((payload_t){SCOPE_GETTIMER});
+      if(scope.fullSyncOn()) {
+        queue.push((payload_t){SCOPE_SENDSYNC});
+      }
+    #endif
+  }
 }
 
 // COMMANDS
@@ -232,68 +234,74 @@ void timer() {
 #ifdef __CONTROLLER__
 
 void checkIR() {
-  decode_results results;
-  if(irrecv.decode(&results)) {
-    if(results.decode_type == NEC) {
-      switch(results.value) {
-      case 0xFFC23D: queue.push((payload_t){DOME_STOP}); break;           // [>||] Stop Dome
-      case 0xFF02FD: queue.push((payload_t){DOME_RIGHT}); break;          // [>>] Dome Right
-      case 0xFF22DD: queue.push((payload_t){DOME_LEFT}); break;           // [<<] Dome Left
-      case 0xFF906F: queue.push((payload_t){SHUTTER_STOP}); break;        // [EQ] Stop Shutter
-      case 0xFFA857: queue.push((payload_t){SHUTTER_OPEN}); break;        // [+] Open Shutter
-      case 0xFFE01F: queue.push((payload_t){SHUTTER_CLOSE}); break;       // [-] Close Shutter
-      case 0xFF629D: queue.push((payload_t){FULL_SYNC}); break;           // [CH] Scope/Shutter/Dome Sync/Stop Sync
-      case 0xFFE21D: queue.push((payload_t){FOCUS_INWARD}); break;        // [CH+] Focus +
-      case 0xFFA25D: queue.push((payload_t){FOCUS_OUTWARD}); break;       // [CH-] Focus -
-      case 0xFF6897: queue.push((payload_t){FOCUS_1}); break;             // [0] Focus 1
-      case 0xFF9867: queue.push((payload_t){FOCUS_10}); break;            // [100+] Focus 10
-      case 0xFFB04F: queue.push((payload_t){FOCUS_100}); break;           // [200+] Focus 100
-      case 0xFF30CF: queue.push((payload_t){DESARSEC_CHANGE}); break;     // [1] Desumidificador Arsec On/Off
-      case 0xFF18E7: queue.push((payload_t){DESBROWN_CHANGE}); break;     // [2] Desumidificador Desidrat Brown On/Off
-      case 0xFF7A85: queue.push((payload_t){DESWHITE_CHANGE}); break;     // [3] Desumidificador Desidrat White On/Off
-      case 0xFF10EF: queue.push((payload_t){SYSPOWER_CHANGE}); break;     // [4] Power System On/Off
-      case 0xFF38C7: queue.push((payload_t){AUTODES_CHANGE}); break;      // [5] Auto control - Desumidificadores
-      case 0xFF5AA5: queue.push((payload_t){CONTROLLER_GETSTATE}); break; // [6] Controller - GetState
-      case 0xFF42BD: queue.push((payload_t){DOME_GETSTATE}); break;       // [7] Dome - GetState
-      case 0xFF4AB5: queue.push((payload_t){SHUTTER_GETSTATE}); break;    // [8] Shutter - GetState
-      case 0xFF52AD: queue.push((payload_t){SCOPE_GETSTATE}); break;      // [9] Scope - GetState
+  if(!abortEv) {
+    decode_results results;
+    if(irrecv.decode(&results)) {
+      if(results.decode_type == NEC) {
+        switch(results.value) {
+        case 0xFFC23D: queue.push((payload_t){DOME_STOP}); break;           // [>||] Stop Dome
+        case 0xFF02FD: queue.push((payload_t){DOME_RIGHT}); break;          // [>>] Dome Right
+        case 0xFF22DD: queue.push((payload_t){DOME_LEFT}); break;           // [<<] Dome Left
+        case 0xFF906F: queue.push((payload_t){SHUTTER_STOP}); break;        // [EQ] Stop Shutter
+        case 0xFFA857: queue.push((payload_t){SHUTTER_OPEN}); break;        // [+] Open Shutter
+        case 0xFFE01F: queue.push((payload_t){SHUTTER_CLOSE}); break;       // [-] Close Shutter
+        case 0xFF629D: queue.push((payload_t){FULL_SYNC}); break;           // [CH] Scope/Shutter/Dome Sync/Stop Sync
+        case 0xFFE21D: queue.push((payload_t){FOCUS_INWARD}); break;        // [CH+] Focus +
+        case 0xFFA25D: queue.push((payload_t){FOCUS_OUTWARD}); break;       // [CH-] Focus -
+        case 0xFF6897: queue.push((payload_t){FOCUS_1}); break;             // [0] Focus 1
+        case 0xFF9867: queue.push((payload_t){FOCUS_10}); break;            // [100+] Focus 10
+        case 0xFFB04F: queue.push((payload_t){FOCUS_100}); break;           // [200+] Focus 100
+        case 0xFF30CF: queue.push((payload_t){DESARSEC_CHANGE}); break;     // [1] Desumidificador Arsec On/Off
+        case 0xFF18E7: queue.push((payload_t){DESBROWN_CHANGE}); break;     // [2] Desumidificador Desidrat Brown On/Off
+        case 0xFF7A85: queue.push((payload_t){DESWHITE_CHANGE}); break;     // [3] Desumidificador Desidrat White On/Off
+        case 0xFF10EF: queue.push((payload_t){SYSPOWER_CHANGE}); break;     // [4] Power System On/Off
+        case 0xFF38C7: queue.push((payload_t){AUTODES_CHANGE}); break;      // [5] Auto control - Desumidificadores
+        case 0xFF5AA5: queue.push((payload_t){CONTROLLER_GETSTATE}); break; // [6] Controller - GetState
+        case 0xFF42BD: queue.push((payload_t){DOME_GETSTATE}); break;       // [7] Dome - GetState
+        case 0xFF4AB5: queue.push((payload_t){SHUTTER_GETSTATE}); break;    // [8] Shutter - GetState
+        case 0xFF52AD: queue.push((payload_t){SCOPE_GETSTATE}); break;      // [9] Scope - GetState
+        }
       }
+      irrecv.resume();
     }
-    irrecv.resume();
   }
 }
 
 void checkModBus() {
-  for(byte i=0; i<MB_REGS; i++)
-    regs[i]=broker.regs[i];
-  if(mbs.update(regs, MB_REGS)>4) {
-    if(regs[MB_CONTROLLER_ARSEC]!=broker.regs[MB_CONTROLLER_ARSEC]) queue.push((payload_t){DESARSEC_CHANGE});
-    if(regs[MB_CONTROLLER_DESBR]!=broker.regs[MB_CONTROLLER_DESBR]) queue.push((payload_t){DESBROWN_CHANGE});
-    if(regs[MB_CONTROLLER_DESWT]!=broker.regs[MB_CONTROLLER_DESWT]) queue.push((payload_t){DESWHITE_CHANGE});
-    if(regs[MB_CONTROLLER_AUTODES]!=broker.regs[MB_CONTROLLER_AUTODES]) queue.push((payload_t){AUTODES_CHANGE});
-    if(regs[MB_CONTROLLER_FULLSYNC]!=broker.regs[MB_CONTROLLER_FULLSYNC]) queue.push((payload_t){FULL_SYNC});
-    if(regs[MB_CONTROLLER_SYSPOWER]!=broker.regs[MB_CONTROLLER_SYSPOWER]) queue.push((payload_t){SYSPOWER_CHANGE});
-    if(regs[MB_DOME_ON_RIGHT]!=broker.regs[MB_DOME_ON_RIGHT] and regs[MB_DOME_ON_RIGHT]>0) queue.push((payload_t){DOME_RIGHT});
-    if(regs[MB_DOME_ON_LEFT]!=broker.regs[MB_DOME_ON_LEFT] and regs[MB_DOME_ON_LEFT]>0) queue.push((payload_t){DOME_LEFT});
-    if(regs[MB_DOME_ON_RIGHT]!=broker.regs[MB_DOME_ON_RIGHT] and regs[MB_DOME_ON_RIGHT]==0) queue.push((payload_t){DOME_STOP});
-    if(regs[MB_DOME_ON_LEFT]!=broker.regs[MB_DOME_ON_LEFT] and regs[MB_DOME_ON_LEFT]==0) queue.push((payload_t){DOME_STOP});
-    if(regs[MB_SCOPE_STEPS]!=broker.regs[MB_SCOPE_STEPS] and regs[MB_SCOPE_STEPS]==1) queue.push((payload_t){FOCUS_1});
-    if(regs[MB_SCOPE_STEPS]!=broker.regs[MB_SCOPE_STEPS] and regs[MB_SCOPE_STEPS]==10) queue.push((payload_t){FOCUS_10});
-    if(regs[MB_SCOPE_STEPS]!=broker.regs[MB_SCOPE_STEPS] and regs[MB_SCOPE_STEPS]==100) queue.push((payload_t){FOCUS_100});
-    if(regs[MB_SHUTTER_OPENING]!=broker.regs[MB_SHUTTER_OPENING] and regs[MB_SHUTTER_OPENING]>0) queue.push((payload_t){SHUTTER_OPEN});
-    if(regs[MB_SHUTTER_CLOSING]!=broker.regs[MB_SHUTTER_CLOSING] and regs[MB_SHUTTER_CLOSING]>0) queue.push((payload_t){SHUTTER_CLOSE});
-    if(regs[MB_SHUTTER_OPENING]!=broker.regs[MB_SHUTTER_OPENING] and regs[MB_SHUTTER_OPENING]==0) queue.push((payload_t){SHUTTER_STOP});
-    if(regs[MB_SHUTTER_CLOSING]!=broker.regs[MB_SHUTTER_CLOSING] and regs[MB_SHUTTER_CLOSING]==0) queue.push((payload_t){SHUTTER_STOP});
-    if(regs[MB_STP_FOCUS_INWARD]) queue.push((payload_t){FOCUS_INWARD});
-    if(regs[MB_STP_FOCUS_OUTWARD]) queue.push((payload_t){FOCUS_OUTWARD});
+  if(!abortEv) {
+    for(byte i=0; i<MB_REGS; i++)
+      regs[i]=broker.regs[i];
+    if(mbs.update(regs, MB_REGS)>4) {
+      if(regs[MB_CONTROLLER_ARSEC]!=broker.regs[MB_CONTROLLER_ARSEC]) queue.push((payload_t){DESARSEC_CHANGE});
+      if(regs[MB_CONTROLLER_DESBR]!=broker.regs[MB_CONTROLLER_DESBR]) queue.push((payload_t){DESBROWN_CHANGE});
+      if(regs[MB_CONTROLLER_DESWT]!=broker.regs[MB_CONTROLLER_DESWT]) queue.push((payload_t){DESWHITE_CHANGE});
+      if(regs[MB_CONTROLLER_AUTODES]!=broker.regs[MB_CONTROLLER_AUTODES]) queue.push((payload_t){AUTODES_CHANGE});
+      if(regs[MB_CONTROLLER_FULLSYNC]!=broker.regs[MB_CONTROLLER_FULLSYNC]) queue.push((payload_t){FULL_SYNC});
+      if(regs[MB_CONTROLLER_SYSPOWER]!=broker.regs[MB_CONTROLLER_SYSPOWER]) queue.push((payload_t){SYSPOWER_CHANGE});
+      if(regs[MB_DOME_ON_RIGHT]!=broker.regs[MB_DOME_ON_RIGHT] and regs[MB_DOME_ON_RIGHT]>0) queue.push((payload_t){DOME_RIGHT});
+      if(regs[MB_DOME_ON_LEFT]!=broker.regs[MB_DOME_ON_LEFT] and regs[MB_DOME_ON_LEFT]>0) queue.push((payload_t){DOME_LEFT});
+      if(regs[MB_DOME_ON_RIGHT]!=broker.regs[MB_DOME_ON_RIGHT] and regs[MB_DOME_ON_RIGHT]==0) queue.push((payload_t){DOME_STOP});
+      if(regs[MB_DOME_ON_LEFT]!=broker.regs[MB_DOME_ON_LEFT] and regs[MB_DOME_ON_LEFT]==0) queue.push((payload_t){DOME_STOP});
+      if(regs[MB_SCOPE_STEPS]!=broker.regs[MB_SCOPE_STEPS] and regs[MB_SCOPE_STEPS]==1) queue.push((payload_t){FOCUS_1});
+      if(regs[MB_SCOPE_STEPS]!=broker.regs[MB_SCOPE_STEPS] and regs[MB_SCOPE_STEPS]==10) queue.push((payload_t){FOCUS_10});
+      if(regs[MB_SCOPE_STEPS]!=broker.regs[MB_SCOPE_STEPS] and regs[MB_SCOPE_STEPS]==100) queue.push((payload_t){FOCUS_100});
+      if(regs[MB_SHUTTER_OPENING]!=broker.regs[MB_SHUTTER_OPENING] and regs[MB_SHUTTER_OPENING]>0) queue.push((payload_t){SHUTTER_OPEN});
+      if(regs[MB_SHUTTER_CLOSING]!=broker.regs[MB_SHUTTER_CLOSING] and regs[MB_SHUTTER_CLOSING]>0) queue.push((payload_t){SHUTTER_CLOSE});
+      if(regs[MB_SHUTTER_OPENING]!=broker.regs[MB_SHUTTER_OPENING] and regs[MB_SHUTTER_OPENING]==0) queue.push((payload_t){SHUTTER_STOP});
+      if(regs[MB_SHUTTER_CLOSING]!=broker.regs[MB_SHUTTER_CLOSING] and regs[MB_SHUTTER_CLOSING]==0) queue.push((payload_t){SHUTTER_STOP});
+      if(regs[MB_STP_FOCUS_INWARD]) queue.push((payload_t){FOCUS_INWARD});
+      if(regs[MB_STP_FOCUS_OUTWARD]) queue.push((payload_t){FOCUS_OUTWARD});
+    }
   }
 }
 #endif
 
 void checkNetwork() {
-  payload_t payload=broker.checkNetwork();
-  if(payload.action!=NOTHING)
-    queue.push(payload);
+  if(!abortEv) {
+    payload_t payload=broker.checkNetwork();
+    if(payload.action!=NOTHING)
+      queue.push(payload);
+  }
 }
 
 //INTERRUPTS

@@ -9,8 +9,8 @@
 //#define __SHUTTER__     // Serial 3
 //#define __SCOPE__       // Serial 4
 
-#define RELEASE 11
-// 24-Mar-2013
+#define RELEASE 12
+// 25-Mar-2013
 
 #define TIMER_INTERVAL 500 // 0.5 second
 

@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2011 James Coliz, Jr. <maniacbug@ymail.com>
+ Copyright (C) 2011 J. Coliz <maniacbug@ymail.com>
 
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License
@@ -24,7 +24,7 @@
 // Hardware configuration
 //
 
-// Set up nRF24L01 radio on SPI bus plus pins 8 & 9
+// Set up nRF24L01 radio on SPI bus plus pins 9 & 10
 
 RF24 radio(9,10);
 
@@ -70,7 +70,7 @@ void setup(void)
   delay(20); // Just to get a solid reading on the role pin
 
   // read the address pin, establish our role
-  if ( digitalRead(role_pin) )
+  if ( ! digitalRead(role_pin) )
     role = role_ping_out;
   else
     role = role_pong_back;

@@ -1,24 +1,10 @@
-#######################################
-# Syntax Coloring Map PinChangeInt
-#######################################
+# LITERAL1 specifies constants
 
-#######################################
-# Datatypes (KEYWORD1)
-#######################################
-PCintPort	KEYWORD1
-pcIntPorts	KEYWORD1
-arduinoPin	KEYWORD1
+# KEYWORD1 specifies datatypes and C/C++ keywords
+pinState	KEYWORD1	PinState
+arduinoPin	KEYWORD1	ArduinoPin
+PCintPort	KEYWORD1	PCInterruptPort
 
-#######################################
-# Methods and Functions (KEYWORD2)
-#######################################
-attachInterrupt	KEYWORD2
-detachInterrupt	KEYWORD2
-
-#######################################
-# Constants (LITERAL1)
-#######################################
-MAX_PIN_CHANGE_PINS	LITERAL1
-NO_PORTB_PINCHANGES	LITERAL1
-NO_PORTC_PINCHANGES	LITERAL1
-NO_PORTD_PINCHANGES	LITERAL1
+# KEYWORD2 specifies methods and functions
+attachInterrupt	KEYWORD2	AttachInterrupt
+detachInterrupt	KEYWORD2	DetachInterrupt

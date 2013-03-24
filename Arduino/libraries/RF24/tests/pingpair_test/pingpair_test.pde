@@ -89,6 +89,8 @@ const int interval = 100; //*< ms to wait between sends */
 
 char configuration = '1'; //*< Configuration key, one char sent in by the test framework to tell us how to configure, this is the default */
 
+uint8_t pipe_number = 1; // Which pipe to send on.
+
 void one_ok(void)
 {
   // Have we received enough yet?
@@ -203,6 +205,20 @@ void setup(void)
     radio.enableDynamicPayloads();
   }
 
+  // Config 4 tests out a higher pipe ##
+  if (configuration == '4' && role == role_sender)
+  {
+    // Set top 4 bytes of the address in pipe 1 
+    radio.openReadingPipe(1,pipe & 0xFFFFFFFF00ULL);
+
+    // indicate the pipe to use 
+    pipe_number = 5;
+  }
+  else if ( role == role_sender )
+  {
+    radio.openReadingPipe(5,0);
+  }
+
   //
   // Open pipes to other nodes for communication
   //
@@ -216,7 +232,7 @@ void setup(void)
   }
   else
   {
-    radio.openReadingPipe(1,pipe);
+    radio.openReadingPipe(pipe_number,pipe);
   }
 
   //
@@ -238,7 +254,22 @@ void setup(void)
   //
 
   attachInterrupt(0, check_radio, FALLING);
+  
+  if ( role == role_receiver )
+    printf("\n\r+OK ");
 }
+
+//
+// Print buffer
+//
+// Printing from the interrupt handler is a bad idea, so we print from there
+// to this intermediate buffer
+//
+
+char prbuf[1000];
+char *prbuf_end = prbuf + sizeof(prbuf);
+char *prbuf_in = prbuf;
+char *prbuf_out = prbuf;
 
 //
 // Loop 
@@ -274,7 +305,7 @@ void loop(void)
     delay(interval);
     
     // Timeout if we have not received anything back ever
-    if ( ! last_message_count && millis() > interval * 10 )
+    if ( ! last_message_count && millis() > interval * 100 )
     {
       printf("No responses received.  Are interrupts connected??\n\r");
       done = true;
@@ -284,6 +315,17 @@ void loop(void)
   //
   // Receiver role: Does nothing!  All the work is in IRQ
   //
+  
+  //
+  // Spew print buffer
+  //
+
+  size_t write_length = prbuf_in - prbuf_out;
+  if ( write_length )
+  {
+    Serial.write(reinterpret_cast<uint8_t*>(prbuf_out),write_length);
+    prbuf_out += write_length;
+  }
   
   //
   // Stop the test if we're done and report results
@@ -299,8 +341,6 @@ void loop(void)
       printf("FAIL\n\r\n\r");
   }
 
-  //
-  //
 }
 
 void check_radio(void)
@@ -313,10 +353,10 @@ void check_radio(void)
   if ( tx )
   {
     if ( role == role_sender )
-      printf("Send:OK ");
+      prbuf_in += sprintf(prbuf_in,"Send:OK ");
 
     if ( role == role_receiver )
-      printf("Ack Payload:Sent\n\r");
+      prbuf_in += sprintf(prbuf_in,"Ack Payload:Sent\n\r");
   }
 
   // Have we failed to transmit?
@@ -324,14 +364,14 @@ void check_radio(void)
   {
     if ( role == role_sender )
     {
-      printf("Send:Failed ");
+      prbuf_in += sprintf(prbuf_in,"Send:Failed ");
 
       // log status of this line
       one_failed();
     }
 
     if ( role == role_receiver )
-      printf("Ack Payload:Failed\n\r");
+      prbuf_in += sprintf(prbuf_in,"Ack Payload:Failed\n\r");
   }
 
   // Transmitter can power down for now, because
@@ -346,19 +386,19 @@ void check_radio(void)
     if ( role == role_sender )
     {
       radio.read(&message_count,sizeof(message_count));
-      printf("Ack:%lu ",message_count);
+      prbuf_in += sprintf(prbuf_in,"Ack:%lu ",message_count);
      
       // is this ack what we were expecting?  to account
       // for failures, we simply want to make sure we get a
       // DIFFERENT ack every time.
       if ( ( message_count != last_message_count ) || ( configuration=='3' && message_count == 16 ) )
       {
-	printf("OK ");
+	prbuf_in += sprintf(prbuf_in,"OK ");
 	one_ok();
       }
       else
       {
-	printf("FAILED ");
+	prbuf_in += sprintf(prbuf_in,"FAILED ");
 	one_failed();
       }
       last_message_count = message_count;
@@ -382,11 +422,11 @@ void check_radio(void)
       receive_payload[len] = 0;
 
       // Spew it
-      printf("Got payload size=%i value=%s strlen=%u\n\r",len,receive_payload,strlen(receive_payload));
+      prbuf_in += sprintf(prbuf_in,"Recv size=%i val=%s len=%u\n\r",len,receive_payload,strlen(receive_payload));
 
       // Add an ack packet for the next time around.
       // Here we will report back how many bytes we got this time.
-      radio.writeAckPayload( 1, &len, sizeof(len) );
+      radio.writeAckPayload( pipe_number, &len, sizeof(len) );
       ++message_count;
     }
   }

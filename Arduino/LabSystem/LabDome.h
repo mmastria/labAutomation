@@ -29,6 +29,9 @@ public:
   void setSwitchHome(LabSwitch *switchHomePtr);
   void setSwitch220v(LabSwitch *switch220vPtr);
   
+  boolean checkDelay();
+  void startDelay();
+  
   void timer();
   void checkSync();
 

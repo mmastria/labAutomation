@@ -34,6 +34,9 @@ void LabShutter::timer() {
 }
 
 payload_t LabShutter::getState() {
+  #ifdef __DEBUG__
+  Serial.println("getState");
+  #endif
   payload_t payload;
   payload=getData();
   payload.action=SHUTTER_RETURNSTATE;
@@ -41,6 +44,9 @@ payload_t LabShutter::getState() {
 }
 
 payload_t LabShutter::getTimer() {
+  #ifdef __DEBUG__
+  Serial.println("getTimer");
+  #endif
   payload_t payload;
   payload=getData();
   payload.action=SHUTTER_TIMER;

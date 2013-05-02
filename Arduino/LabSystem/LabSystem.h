@@ -3,16 +3,20 @@
 
 #include "Arduino.h"
 
-//#define __DEBUG__
-#define __CONTROLLER__  // Serial 1
-//#define __DOME__        // Serial 2
+#define __DEBUG__
+//#define __CONTROLLER__  // Serial 1
+#define __DOME__        // Serial 2
 //#define __SHUTTER__     // Serial 3
 //#define __SCOPE__       // Serial 4
 
-#define RELEASE 12
-// 25-Mar-2013
+#define RELEASE 13
+// 01-May-2013
 
 #define TIMER_INTERVAL 500 // 0.5 second
+
+#ifdef __DOME__
+#define SWITCH_DELAY 60 // cycles of TIMER_INTERVAL
+#endif
 
 #ifdef __SCOPE__
 #define TEMPERATURE_MAX_DEV 2
@@ -113,7 +117,7 @@ typedef enum { NOTHING,
                CONTROLLER_GETSTATE, CONTROLLER_RETURNSTATE, 
                CONTROLLER_GETTIMER, CONTROLLER_TIMER, 
                
-               FULL_SYNC,  } action_e;
+               FULL_SYNC  } action_e;
 
 struct payload_t {
   action_e action;
@@ -123,6 +127,51 @@ struct payload_t {
   byte b4;
   int i1;
 };
+
+#ifndef __CONTROLLER__
+static const char *action_desc[] =
+             { "NOTHING",
+
+               "DOME_STOP", 
+               "DOME_RIGHT", 
+               "DOME_LEFT", 
+               "DOME_SENSORHOME", 
+               "DOME_SENSOR220V", 
+               "DOME_GETSTATE", "DOME_RETURNSTATE", 
+               "DOME_GETTIMER", "DOME_TIMER",
+               
+               "SHUTTER_STOP", 
+               "SHUTTER_OPEN", 
+               "SHUTTER_CLOSE", 
+               "SHUTTER_SENSOROPENED", 
+               "SHUTTER_SENSORCLOSED", 
+               "SHUTTER_GETSTATE", "SHUTTER_RETURNSTATE", 
+               "SHUTTER_GETTIMER", "SHUTTER_TIMER",
+               "SHUTTER_SENDSYNC", "SHUTTER_SYNC",
+               
+               "SCOPE_GETSTATE", "SCOPE_RETURNSTATE", 
+               "SCOPE_GETTIMER", "SCOPE_TIMER", 
+               "SCOPE_SENDSYNC", "SCOPE_SYNC",
+               
+               "FOCUS_INWARD", 
+               "FOCUS_OUTWARD", 
+               "FOCUS_1", 
+               "FOCUS_10", 
+               "FOCUS_100",
+               
+               "DESARSEC_CHANGE", 
+               "DESBROWN_CHANGE", 
+               "DESWHITE_CHANGE", 
+               "AUTODES_CHANGE", 
+               
+               "SYSPOWER_CHANGE", 
+               
+               "CONTROLLER_GETSTATE", "CONTROLLER_RETURNSTATE", 
+               "CONTROLLER_GETTIMER", "CONTROLLER_TIMER", 
+               
+               "FULL_SYNC"  };
+
+#endif
 
 // CONTROLLER
 // b1: relayArsec = ArsecOn

@@ -171,7 +171,7 @@ void switchHomeEvent() {
 }
 
 void switch220vEvent() {
-  queue.push((payload_t){DOME_SENSOR220V});
+  dome.startDelay();
 }
 
 void encoderEvent() {
@@ -211,6 +211,8 @@ void timer() {
       dome.timer();
       dome.checkSync();
       queue.push((payload_t){DOME_GETTIMER});
+      if(dome.checkDelay())
+        queue.push((payload_t){DOME_SENSOR220V});
     #endif
     #ifdef __SHUTTER__
       shutter.timer();
@@ -341,6 +343,7 @@ void setup() {
     dome.setMotor(&domeMotor);
     dome.setEncoder(&encoder);
     dome.setSwitchHome(&switchHome);
+    switch220v.setDelayStart(SWITCH_DELAY);
     dome.setSwitch220v(&switch220v);
     broker.setDome(&dome);
     setupIrqDome();
@@ -371,7 +374,6 @@ void setup() {
     controller.lcdPrint(RELEASE);
     controller.lcdSetCursor(0,1);
     controller.lcdPrint("(c)2012, Mastria");
-    millisTimer=millis();
   #else
     #ifdef __DEBUG__
       Serial.begin(9600);
@@ -380,6 +382,7 @@ void setup() {
       queue.setPrinter(Serial);
     #endif
   #endif
+  millisTimer=millis();
   broker.beep();
   delay(50);
   broker.beep();
@@ -405,6 +408,22 @@ void loop() {
     noInterrupts();
     payload_t payload=queue.pop();
     interrupts();
+    #ifndef __CONTROLLER__
+    #ifdef __DEBUG__
+    switch(payload.action) {
+      case CONTROLLER_GETTIMER:
+      case DOME_GETTIMER:
+      case SHUTTER_GETTIMER:
+      case SCOPE_GETTIMER:
+        break;
+      default:
+        Serial.print("action: ");
+        Serial.print(payload.action);
+        Serial.print(" - ");
+        Serial.println(action_desc[payload.action]);
+    }
+    #endif
+    #endif
     broker.action(payload);
     abortEv=false;
   }

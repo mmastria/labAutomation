@@ -13,18 +13,30 @@ LabDome::LabDome() {
 }
 
 void LabDome::right() {
+  #ifdef __DEBUG__
+  Serial.println("right");
+  #endif
   _motorPtr->forward();
 }
 
 void LabDome::left() {
+  #ifdef __DEBUG__
+  Serial.println("left");
+  #endif
   _motorPtr->reverse();
 }
 
 void LabDome::stop() {
+  #ifdef __DEBUG__
+  Serial.println("stop");
+  #endif
   _motorPtr->off();
 }
 
 void LabDome::home() {
+  #ifdef __DEBUG__
+  Serial.println("home");
+  #endif
   _encoderPtr->reset();
 }
 
@@ -57,6 +69,9 @@ void LabDome::timer() {
 }
 
 payload_t LabDome::getState() {
+  #ifdef __DEBUG__
+  Serial.println("getState");
+  #endif
   payload_t payload;
   payload=getData();
   payload.action=DOME_RETURNSTATE;
@@ -64,6 +79,9 @@ payload_t LabDome::getState() {
 }
   
 payload_t LabDome::getTimer() {
+  #ifdef __DEBUG__
+  Serial.println("getTimer");
+  #endif
   payload_t payload;
   payload=getData();
   payload.action=DOME_TIMER;
@@ -80,7 +98,21 @@ payload_t LabDome::getData() {
   return r;
 }
 
+void LabDome::startDelay() {
+  #ifdef __DEBUG__
+  Serial.println("startDelay");
+  #endif
+  _switch220vPtr->startDelay();
+}
+
+boolean LabDome::checkDelay() {
+  return _switch220vPtr->checkDelay();
+}
+
 void LabDome::fullSync(boolean fullSync) {
+  #ifdef __DEBUG__
+  Serial.println("fullSync");
+  #endif
   _fullSync=fullSync;
 }
 
